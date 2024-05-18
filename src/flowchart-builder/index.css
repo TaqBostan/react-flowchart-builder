@@ -1,0 +1,33 @@
+.source {
+  display: none;
+}
+
+.grabbable:hover + .source, .source:hover {
+  display: block;
+}
+
+.grabbable {
+  cursor: move;
+  cursor: grab;
+}
+
+.grabbable:active {
+  cursor: grabbing;
+}
+
+.connectable:hover {
+  stroke:rgb(34, 112, 79);
+}
+
+.connector {
+  fill:none;
+  stroke-width:1.5;
+}
+
+.no-select {
+  user-select: none;
+}
+
+.pointer {
+  cursor: pointer;
+}
