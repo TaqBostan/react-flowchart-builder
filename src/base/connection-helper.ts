@@ -71,7 +71,7 @@ export default class ConnectionHelper {
       if (c.self) c.slope = 0;
       else {
         let nextCenter = c.nextNode.sideCenter(vertical, !firstSide), vector = { X: nextCenter.X - sideCenter.X, Y: nextCenter.Y - sideCenter.Y };
-        if(vertical) c.slope = vector.Y === 0 ? 1000 * Math.sign(vector.X) : vector.X / vector.Y;
+        if (vertical) c.slope = vector.Y === 0 ? 1000 * Math.sign(vector.X) : vector.X / vector.Y;
         else c.slope = vector.X === 0 ? 1000 * Math.sign(vector.Y) : vector.Y / vector.X;
       }
     })

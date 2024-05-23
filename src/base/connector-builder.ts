@@ -51,7 +51,8 @@ export default class ConnectorBuilder {
         slope: 0,
         vertical: connFacet.vertical,
         firstSide: self ? true : !connFacet.inOrder,
-        self, toDest: true
+        self,
+        toDest: true
       }
       originNode.connectors.push(originConn);
       icon.onmousedown = (event: MouseEvent) => this.icon_md(event, originNode, originConn);
@@ -95,7 +96,7 @@ export default class ConnectorBuilder {
       if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
         let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector?.id)!;
         this.sourceNode!.connectors.splice(index1, 1);
-        if(!this.connector.self) {
+        if (!this.connector.self) {
           let index2 = this.connector.nextNode.connectors.findIndex(c => c.id === this.connector?.id)!;
           this.connector.nextNode.connectors.splice(index2, 1);
         }

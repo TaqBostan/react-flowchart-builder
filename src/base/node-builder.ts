@@ -11,8 +11,10 @@ export default class NodeBuilder {
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder) {
   }
 
-  creat(left: number, top: number, text: string): Node {
-    let n = new Node(++this.maxId, left, top, text);
+  create(left: number, top: number, text: string, id?: number): Node {
+    if(id === undefined) id = ++this.maxId;
+    else if(id > this.maxId) this.maxId = id;
+    let n = new Node(id, left, top, text);
     this.svg.append(n.group);
     n.group.setAttribute('transform', `translate(${left},${top})`);
     n.box.setAttribute('class', 'grabbable');

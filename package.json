@@ -1,6 +1,6 @@
 {
   "name": "react-flowchart-builder",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,5 +35,8 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "bugs": {
+    "url": "https://github.com/TaqBostan/react-flowchart-builder/issues"
+  }
 }
