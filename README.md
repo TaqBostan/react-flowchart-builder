@@ -1,4 +1,4 @@
-A lightweight component to design flowcharts. 
+A lightweight component to design flowcharts. Check out the [demo](https://d5y3kk.csb.app/) for some examples.
 
 ## Usage
 
