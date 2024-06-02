@@ -30,21 +30,25 @@ export default class ConnectorBuilder {
     }
   }
 
-  connect(node: Node) {
+  connect(node: Node, label?: string) {
     if (this.sourceNode) {
       let originNode = this.sourceNode;
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let connFacet = ConnHelper.connFacet(originNode, node);
-      let path = ConnHelper.createConnector();
-      let icon = ConnHelper.createIcon();
-      let arrow = !self ? ConnHelper.createArrow() : undefined;
       let group = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
+      let path = ConnHelper.createConnector();
+      let arrow = !self ? ConnHelper.createArrow() : undefined;
+      group.append(path);
+      if (!self) group.append(arrow!);
+      this.svg.append(group);
+      let id = ++this.maxId;
+      let connLabel = ConnHelper.addLabel(label || ('conn_' + id), group);
       let originConn: Connector = {
-        id: ++this.maxId,
+        id,
         group,
         path,
-        icon,
+        label: connLabel,
         arrow,
         nextNode: node,
         point: { X: 0, Y: 0 },
@@ -55,7 +59,7 @@ export default class ConnectorBuilder {
         toDest: true
       }
       originNode.connectors.push(originConn);
-      icon.onmousedown = (event: MouseEvent) => this.icon_md(event, originNode, originConn);
+      connLabel.g.onmousedown = (event: MouseEvent) => this.icon_md(event, originNode, originConn);
       ConnHelper.arrangeConn(originNode, connFacet.vertical, !connFacet.inOrder);
       if (!self) {
         let conn = { ...originConn, nextNode: originNode, point: { X: 0, Y: 0 }, firstSide: !originConn.firstSide, toDest: !originConn.toDest }
@@ -64,9 +68,6 @@ export default class ConnectorBuilder {
         this.updateConn(node, connFacet.vertical, connFacet.inOrder);
       }
       this.updateConn(originNode, connFacet.vertical, !connFacet.inOrder);
-      group.append(path, icon);
-      if (!self) group.append(arrow!);
-      this.svg.append(group);
     }
   }
 
@@ -149,9 +150,8 @@ export default class ConnectorBuilder {
         let fi = Math.atan2(dest.Y - origin.Y, dest.X - origin.X) * 180 / Math.PI + curve * (connector.toDest ? 1 : -1) * 10;
         connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${fi})`);
       }
-      let p: Point = connector.self ? { X: p1.X, Y: p1.Y - 42 } : ConnHelper.iconPoint(p1, p2);
-      connector.icon.setAttribute('x', (p.X - 6).toString());
-      connector.icon.setAttribute('y', (p.Y - 4).toString());
+      let p: Point = connector.self ? { X: p1.X, Y: p1.Y - 42 } : ConnHelper.iconPoint(p1, p2), lbl = connector.label;
+      lbl.g.setAttribute('transform',`translate(${p.X - lbl.size.X / 2},${p.Y - lbl.size.Y / 2})`);
       connector.path.setAttribute('d', pathD);
     });
   }

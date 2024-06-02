@@ -15,8 +15,8 @@ export const FlowchartPrimary: FC = () => {
       { X: 150, Y: 50, text: 'node2', id: 2 },
     ];
     let connectors = [
-      { from: 1, to: 2 },
-      { from: 2, to: 2 },
+      { from: 1, to: 2, text: '✕' },
+      { from: 2, to: 2, text: '✕' },
     ];
     flowchart.addNodes(nodes, connectors);
     setData(flowchart.getData());

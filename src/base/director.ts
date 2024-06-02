@@ -19,7 +19,7 @@ export default class Director {
       let origin = this.nodes.find(n => n.id === connector.from), destination = this.nodes.find(n => n.id === connector.to);
       if (!origin || !destination) throw Error('Node from/to not found!');
       this.connBuilder.sourceNode = origin;
-      this.connBuilder.connect(destination);
+      this.connBuilder.connect(destination, connector.text);
     });
   }
 

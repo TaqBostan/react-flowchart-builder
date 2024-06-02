@@ -38,8 +38,8 @@ const load = () => {
     { id: 2, text: 'node2', X: 150, Y: 50 },
   ];
   let connectors = [
-    { from: 1, to: 2 },
-    { from: 2, to: 2 },
+    { from: 1, to: 2, text: 'conn1' },
+    { from: 2, to: 2, text: 'conn2' },
   ];
   flowchart.addNodes(nodes, connectors);
 }

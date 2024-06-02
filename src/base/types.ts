@@ -35,8 +35,8 @@ export class Node {
 
 export type NodeData = { id?: number, X: number, Y: number, text: string }
 
-export type Connector = { id: number, group: SVGGElement, path: SVGPathElement, icon: SVGRectElement, arrow?: SVGPathElement, nextNode: Node, point: Point, slope: number, vertical: boolean, firstSide: boolean, self: boolean, toDest: boolean }
+export type Connector = { id: number, group: SVGGElement, path: SVGPathElement, label: { g: SVGGElement, size: Point }, arrow?: SVGPathElement, nextNode: Node, point: Point, slope: number, vertical: boolean, firstSide: boolean, self: boolean, toDest: boolean }
 
-export type ConnectorData = { from: number, to: number }
+export type ConnectorData = { from: number, to: number, text?: string }
 
 export type Point = { X: number, Y: number }

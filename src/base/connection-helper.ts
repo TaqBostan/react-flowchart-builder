@@ -23,14 +23,30 @@ export default class ConnectionHelper {
     return c;
   }
 
-  static createIcon(): SVGRectElement {
-    let r = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
-    r.setAttribute('height', '8');
-    r.setAttribute('width', '12');
-    r.setAttribute('rx', '2');
-    r.setAttribute('fill', 'green');
-    r.setAttribute('class', 'grabbable');
-    return r;
+  static addLabel(text: string, container: SVGGElement) {
+    let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
+    let txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
+    let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
+    txt.innerHTML = text;
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('class', 'grabbable label-text');
+
+    box.setAttribute('rx', '3');
+    box.setAttribute('ry', '3');
+    box.setAttribute('class', 'grabbable label-box');
+
+    g.append(box, txt);
+    container.append(g);
+
+    let bbox = txt.getBBox();
+    let width = Math.max(bbox.width, 14);
+    let size: Point = { X: width + 6, Y: bbox.height + 4 };
+    txt.setAttribute('x', (width / 2 + 3).toString());
+    txt.setAttribute('y', (bbox.height - 1).toString());
+    box.setAttribute('height', size.Y.toString());
+    box.setAttribute('width', size.X.toString());
+
+    return { g, size };
   }
 
   static createArrow(): SVGPathElement {
@@ -76,7 +92,7 @@ export default class ConnectionHelper {
       }
     })
     connectors.sort((c1, c2) => firstSide ? (c2.slope - c1.slope) : (c1.slope - c2.slope));
-    let dis = Math.min(10, (vertical ? (node.width - 10) / count : (node.height - 10) / count));
+    let dis = Math.min(15, (vertical ? (node.width - 10) / count : (node.height - 10) / count));
     connectors.forEach((connector, i) => {
       connector.point = { ...sideCenter };
       if (vertical) connector.point.X -= ((count - 1) / 2 - i) * dis;
