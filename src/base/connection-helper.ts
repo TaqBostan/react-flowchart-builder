@@ -7,7 +7,7 @@ export default class ConnectionHelper {
     let p2 = [b.X - d[0] + v[0], b.Y - d[1] + v[1]];
     return { path: `M${a.X},${a.Y}C${p1[0]},${p1[1]},${p2[0]},${p2[1]},${b.X},${b.Y}`, curve: sign };
   }
-  static iconPoint(a: Point, b: Point): Point {
+  static labelPoint(a: Point, b: Point): Point {
     let c = [b.X - a.X, b.Y - a.Y], sign = c[0] > 0 ? 1 : -1, v = [sign * c[1] / 16.8, -sign * c[0] / 16.8];
     return { X: a.X + c[0] / 2 + v[0], Y: a.Y + c[1] / 2 + v[1] };
   }
