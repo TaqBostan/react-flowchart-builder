@@ -25,7 +25,7 @@ export const FlowchartPrimary: FC = () => {
   return (
     <div className="App">
       <input type='text' value={txt} onChange={e => setTxt(e.target.value)} />
-      <button onClick={() => { flowchart!.addNode(100, 100, txt) }}>Add Node</button>
+      <button onClick={() => { flowchart!.addRectNode(100, 100, txt) }}>Add Rectangle Node</button>
       <button onClick={() => { setData(flowchart!.getData()) }}>Get Nodes and Connections</button>
       <div>
         <Flowchart setHandles={setHandles} width='700px' height='400px' onReady={onReady} />

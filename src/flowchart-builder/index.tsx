@@ -3,17 +3,20 @@ import { FlowchartHandles } from './hook';
 import './index.css';
 import Director from '../base/director';
 import { ConnectorData, NodeData } from '../base/types';
+import { RectNode } from '../base/builders/rect/rect-node';
 
 const Flowchart = (props: FlowchartProps) => {
   const wrapper = useRef<SVGSVGElement>(null);
   const getDirector = () => Director.instance;
 
   const getHandles = () => ({
-    addNode(left: number, top: number, text: string, id?: number) {
-      return getDirector().addNode(left, top, text, id);
+    addRectNode(left: number, top: number, text: string, id?: number) {
+      return getDirector().addNode(new RectNode(id || 0, left, top, text));
     },
     addNodes(nodes: NodeData[], conns: ConnectorData[] = []) {
-      getDirector().addNodes(nodes, conns);
+      let rectangles = nodes.filter(n => !n.shape || n.shape === 'rectangle').map(n => new RectNode(n.id || 0, n.X, n.Y, n.text))
+      getDirector().addNodes(rectangles);
+      getDirector().addConns(conns);
     },
     getData() {
       return getDirector().getData();

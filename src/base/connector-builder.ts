@@ -1,5 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point } from './types'
+import { Connector, Node, Point, Side } from './types'
 
 export default class ConnectorBuilder {
   maxId: number = 0;
@@ -35,7 +35,7 @@ export default class ConnectorBuilder {
       let originNode = this.sourceNode;
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
-      let connFacet = ConnHelper.connFacet(originNode, node);
+      let sideOrigin = originNode.connSide(node);
       let group = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
       let path = ConnHelper.createConnector();
       let arrow = !self ? ConnHelper.createArrow() : undefined;
@@ -53,21 +53,21 @@ export default class ConnectorBuilder {
         nextNode: node,
         point: { X: 0, Y: 0 },
         slope: 0,
-        vertical: connFacet.vertical,
-        firstSide: self ? true : !connFacet.inOrder,
+        side: sideOrigin,
         self,
         toDest: true
       }
       originNode.connectors.push(originConn);
       connLabel.g.onmousedown = (event: MouseEvent) => this.label_md(event, originNode, originConn);
-      ConnHelper.arrangeConn(originNode, connFacet.vertical, !connFacet.inOrder);
+      originNode.arrangeSide(sideOrigin);
       if (!self) {
-        let conn = { ...originConn, nextNode: originNode, point: { X: 0, Y: 0 }, firstSide: !originConn.firstSide, toDest: !originConn.toDest }
+        let side = node.connSide(originNode);
+        let conn = { ...originConn, nextNode: originNode, point: { X: 0, Y: 0 }, side, toDest: !originConn.toDest }
         node.connectors.push(conn);
-        ConnHelper.arrangeConn(node, connFacet.vertical, connFacet.inOrder);
-        this.updateConn(node, connFacet.vertical, connFacet.inOrder);
+        node.arrangeSide(side);
+        this.updateConn(node, side);
       }
-      this.updateConn(originNode, connFacet.vertical, !connFacet.inOrder);
+      this.updateConn(originNode, sideOrigin);
     }
   }
 
@@ -132,14 +132,11 @@ export default class ConnectorBuilder {
   }
 
   updateAllConn(node: Node) {
-    this.updateConn(node, true, true);
-    this.updateConn(node, true, false);
-    this.updateConn(node, false, true);
-    this.updateConn(node, false, false);
+    node.allSides().forEach(s => this.updateConn(node, s));
   }
 
-  updateConn(node: Node, vertical: boolean, firstSide: boolean) {
-    node.connectors.filter(c => c.vertical === vertical && c.firstSide === firstSide).forEach(connector => {
+  updateConn(node: Node, side: Side) {
+    node.connectors.filter(c => c.side.equal(side)).forEach(connector => {
       let p1 = connector.point, p2 = connector.nextNode.connectors.find(c => c.id === connector.id)!.point;
       let pathD: string;
       if (connector.self) pathD = ConnHelper.roundPath(p1);

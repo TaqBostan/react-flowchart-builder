@@ -1,16 +1,23 @@
-export class Node {
-  group: SVGGElement;
-  box: SVGRectElement;
-  label: SVGTextElement;
-  source: SVGRectElement;
+let svgns = "http://www.w3.org/2000/svg";
+export abstract class Node {
+  group: SVGGElement = document.createElementNS(svgns, 'g') as SVGGElement;
+  label: SVGTextElement = document.createElementNS(svgns, 'text') as SVGTextElement;
+  source: SVGRectElement = document.createElementNS(svgns, 'rect') as SVGRectElement;
+  abstract box: SVGElement;
   pointer?: SVGPathElement;
   connectors: Connector[] = [];
-  constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 50) {
-    let svgns = "http://www.w3.org/2000/svg";
-    this.group = document.createElementNS(svgns, 'g') as SVGGElement;
-    this.box = document.createElementNS(svgns, 'rect') as SVGRectElement;
-    this.label = document.createElementNS(svgns, 'text') as SVGTextElement;
-    this.source = document.createElementNS(svgns, 'rect') as SVGRectElement;
+  abstract center(): Point;
+  abstract allSides(): Side[];
+  abstract connSide(node2: Node): Side;
+  abstract arrangeSide(side: Side): void;
+  constructor(public id: number, public left: number, public top: number, public text: string) {
+  }
+
+  arrangeSides() {
+    this.allSides().forEach(s => this.arrangeSide(s));
+  }
+
+  grouping() {
     this.group.append(this.box);
     this.box.before(this.label);
     this.group.append(this.source);
@@ -21,21 +28,15 @@ export class Node {
     this.left = left;
     this.group.setAttribute('transform', `translate(${left},${top})`);
   }
-
-  center(): Point {
-    return { X: this.left + this.width / 2, Y: this.top + this.height / 2 };
-  }
-
-  sideCenter(vertical: boolean, firstSide: boolean): Point {
-    let center = this.center(), sign = firstSide ? -1 : 1;
-    if (vertical) return { X: center.X, Y: center.Y + sign * this.height / 2 };
-    else return { X: center.X + sign * this.width / 2, Y: center.Y };
-  }
 }
 
-export type NodeData = { id?: number, X: number, Y: number, text: string }
+export abstract class Side {
+  abstract equal(s: Side): boolean;
+}
 
-export type Connector = { id: number, group: SVGGElement, path: SVGPathElement, label: { g: SVGGElement, size: Point }, arrow?: SVGPathElement, nextNode: Node, point: Point, slope: number, vertical: boolean, firstSide: boolean, self: boolean, toDest: boolean }
+export type NodeData = { id?: number, X: number, Y: number, text: string, shape?: string }
+
+export type Connector = { id: number, group: SVGGElement, path: SVGPathElement, label: { g: SVGGElement, size: Point }, arrow?: SVGPathElement, nextNode: Node, point: Point, slope: number, side: Side, self: boolean, toDest: boolean }
 
 export type ConnectorData = { from: number, to: number, text?: string }
 

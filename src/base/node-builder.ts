@@ -1,29 +1,26 @@
 
-import ConnHelper from './connection-helper';
 import ConnectorBuilder from './connector-builder';
 import { Node, Point } from './types'
 
-export default class NodeBuilder {
+export default abstract class NodeBuilder<N extends Node> {
   maxId: number = 0;
   origin?: Point;
   node?: Node;
-  
+  abstract ofType<T extends Node>(node: T): boolean;
+  abstract setSize(n: Node): void;
+
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder) {
   }
 
-  create(left: number, top: number, text: string, id?: number): Node {
-    if(id === undefined) id = ++this.maxId;
-    else if(id > this.maxId) this.maxId = id;
-    let n = new Node(id, left, top, text);
+  add(n: Node): Node {
+    if (n.id === 0) n.id = ++this.maxId;
+    else if (n.id > this.maxId) this.maxId = n.id;
+    n.grouping();
     this.svg.append(n.group);
-    n.group.setAttribute('transform', `translate(${left},${top})`);
+    n.group.setAttribute('transform', `translate(${n.left},${n.top})`);
     n.box.setAttribute('class', 'grabbable');
-    n.box.setAttribute('x', '0');
-    n.box.setAttribute('y', '0');
-    n.box.setAttribute('height', n.height.toString());
     n.box.setAttribute('stroke', 'black');
     n.box.setAttribute('stroke-width', '1');
-    n.box.setAttribute('rx', '5');
     n.box.setAttribute('fill', 'transparent');
 
     n.label.setAttribute('x', '10');
@@ -31,13 +28,10 @@ export default class NodeBuilder {
     n.label.setAttribute('font-size', '16');
     n.label.setAttribute('font-family', 'arial,sans-serif');
     n.label.setAttribute('class', 'no-select');
-    n.label.innerHTML = text;
+    n.label.innerHTML = n.text;
     n.label.setAttribute('y', (21.5 + n.label.getBBox().height / 2).toString());
-    n.width = 20 + Math.max(20, n.label.getBBox().width);
-    n.box.setAttribute('width', n.width.toString());
 
     n.source.setAttribute('class', 'source pointer');
-    n.source.setAttribute('x', (n.width - 20).toString());
     n.source.setAttribute('y', '19.5');
     n.source.setAttribute('height', '12');
     n.source.setAttribute('width', '12');
@@ -46,6 +40,7 @@ export default class NodeBuilder {
     n.source.setAttribute('rx', '3');
     n.source.setAttribute('fill', 'orange');
 
+    this.setSize(n);
     return n;
   }
 
@@ -57,27 +52,25 @@ export default class NodeBuilder {
     if (e.button === 0 && !this.origin) {
       this.origin = { X: e.clientX, Y: e.clientY };
       this.node = node;
-      this.svg.onmousemove = (event: MouseEvent) =>this.node_mm(event);
+      this.svg.onmousemove = (event: MouseEvent) => this.node_mm(event);
       node.group.onmouseup = (event: MouseEvent) => this.node_mu(event);
     }
   }
 
   node_mm(e: MouseEvent) {
-    if (e.button === 0 && this.origin &&this.node) {
+    if (e.button === 0 && this.origin && this.node) {
       this.node.move(this.node.left + e.clientX - this.origin.X, this.node.top + e.clientY - this.origin.Y);
       this.node.connectors.forEach(connector => {
-        let connFacet = ConnHelper.connFacet(this.node!, connector.nextNode);
-        connector.vertical = connFacet.vertical;
-        connector.firstSide = connector.self ? true : !connFacet.inOrder;
-        if(!connector.self) {
+        connector.side = this.node!.connSide(connector.nextNode);
+        if (!connector.self) {
+          let side2 = connector.nextNode.connSide(this.node!);
           let connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!;
-          connector2.vertical = connFacet.vertical;
-          connector2.firstSide = connFacet.inOrder;
+          connector2.side = side2;
+          connector.nextNode.arrangeSide(side2);
+          this.connBuilder.updateConn(connector.nextNode, side2);
         }
-        ConnHelper.arrangeConn(connector.nextNode, connFacet.vertical, connFacet.inOrder);
-        this.connBuilder.updateConn(connector.nextNode, connFacet.vertical, connFacet.inOrder);
       });
-      ConnHelper.arrangeAllConn(this.node);
+      this.node.arrangeSides();
       this.connBuilder.updateAllConn(this.node);
       this.origin = { X: e.clientX, Y: e.clientY };
     }

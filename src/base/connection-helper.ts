@@ -7,6 +7,7 @@ export default class ConnectionHelper {
     let p2 = [b.X - d[0] + v[0], b.Y - d[1] + v[1]];
     return { path: `M${a.X},${a.Y}C${p1[0]},${p1[1]},${p2[0]},${p2[1]},${b.X},${b.Y}`, curve: sign };
   }
+  
   static labelPoint(a: Point, b: Point): Point {
     let c = [b.X - a.X, b.Y - a.Y], sign = c[0] > 0 ? 1 : -1, v = [sign * c[1] / 16.8, -sign * c[0] / 16.8];
     return { X: a.X + c[0] / 2 + v[0], Y: a.Y + c[1] / 2 + v[1] };
@@ -61,42 +62,5 @@ export default class ConnectionHelper {
     p.setAttribute("class", "connector");
     p.setAttribute("stroke", "green");
     return p;
-  }
-
-  static connFacet(node1: Node, node2: Node) {
-    if (node1.id === node2.id) return { vertical: true, inOrder: false };
-    let c1 = node1.center(), w1 = node1.width, h1 = node1.height,
-      c2 = node2.center(), w2 = node2.width, h2 = node2.height;
-    let vertical = Math.abs(c2.Y - c1.Y) * (w1 + w2) > Math.abs(c2.X - c1.X) * (h1 + h2);
-    let inOrder = vertical ? (c1.Y < c2.Y) : (c1.X < c2.X);
-    return { vertical, inOrder };
-  }
-
-
-  static arrangeAllConn(node: Node) {
-    this.arrangeConn(node, true, true);
-    this.arrangeConn(node, true, false);
-    this.arrangeConn(node, false, true);
-    this.arrangeConn(node, false, false);
-  }
-
-  static arrangeConn(node: Node, vertical: boolean, firstSide: boolean) {
-    let sideCenter = node.sideCenter(vertical, firstSide);
-    let connectors = node.connectors.filter(c => c.vertical === vertical && c.firstSide === firstSide), count = connectors.length;
-    connectors.forEach(c => {
-      if (c.self) c.slope = 0;
-      else {
-        let nextCenter = c.nextNode.sideCenter(vertical, !firstSide), vector = { X: nextCenter.X - sideCenter.X, Y: nextCenter.Y - sideCenter.Y };
-        if (vertical) c.slope = vector.Y === 0 ? 1000 * Math.sign(vector.X) : vector.X / vector.Y;
-        else c.slope = vector.X === 0 ? 1000 * Math.sign(vector.Y) : vector.Y / vector.X;
-      }
-    })
-    connectors.sort((c1, c2) => firstSide ? (c2.slope - c1.slope) : (c1.slope - c2.slope));
-    let dis = Math.min(15, (vertical ? (node.width - 10) / count : (node.height - 10) / count));
-    connectors.forEach((connector, i) => {
-      connector.point = { ...sideCenter };
-      if (vertical) connector.point.X -= ((count - 1) / 2 - i) * dis;
-      else connector.point.Y -= ((count - 1) / 2 - i) * dis;
-    });
   }
 }
