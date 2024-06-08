@@ -1,7 +1,8 @@
+import CircleBuilder from "./builders/circle/circ-builder";
 import RectBuilder from "./builders/rect/rect-builder";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
-import { ConnectorData, Node, NodeData } from "./types";
+import { ConnectorData, Node } from "./types";
 
 export default class Director {
   static instance: Director;
@@ -11,7 +12,7 @@ export default class Director {
 
   constructor(public svg: SVGSVGElement) {
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
-    this.builders = [new RectBuilder(svg, this.connBuilder)];
+    this.builders = [new RectBuilder(svg, this.connBuilder), new CircleBuilder(svg, this.connBuilder)];
   }
 
   getBuilder<T extends Node>(node: T): NodeBuilder<T> {

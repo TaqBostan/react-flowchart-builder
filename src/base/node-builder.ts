@@ -3,7 +3,7 @@ import ConnectorBuilder from './connector-builder';
 import { Node, Point } from './types'
 
 export default abstract class NodeBuilder<N extends Node> {
-  maxId: number = 0;
+  static maxId: number = 0;
   origin?: Point;
   node?: Node;
   abstract ofType<T extends Node>(node: T): boolean;
@@ -13,8 +13,8 @@ export default abstract class NodeBuilder<N extends Node> {
   }
 
   add(n: Node): Node {
-    if (n.id === 0) n.id = ++this.maxId;
-    else if (n.id > this.maxId) this.maxId = n.id;
+    if (n.id === 0) n.id = ++NodeBuilder.maxId;
+    else if (n.id > NodeBuilder.maxId) NodeBuilder.maxId = n.id;
     n.grouping();
     this.svg.append(n.group);
     n.group.setAttribute('transform', `translate(${n.left},${n.top})`);
@@ -29,7 +29,6 @@ export default abstract class NodeBuilder<N extends Node> {
     n.label.setAttribute('font-family', 'arial,sans-serif');
     n.label.setAttribute('class', 'no-select');
     n.label.innerHTML = n.text;
-    n.label.setAttribute('y', (21.5 + n.label.getBBox().height / 2).toString());
 
     n.source.setAttribute('class', 'source pointer');
     n.source.setAttribute('y', '19.5');

@@ -11,12 +11,12 @@ export const FlowchartPrimary: FC = () => {
 
   const onReady = (flowchart: FlowchartHandles) => {
     let nodes = [
-      { X: 50, Y: 50, text: 'node1', id: 1 },
+      { X: 50, Y: 50, text: 'node2', id: 1, shape: 'circle' },
       { X: 150, Y: 50, text: 'node2', id: 2 },
     ];
     let connectors = [
-      { from: 1, to: 2, text: '✕' },
-      { from: 2, to: 2, text: '✕' },
+      { from: 1, to: 2, text: 'label 1' },
+      { from: 2, to: 2, text: 'label 2' },
     ];
     flowchart.addNodes(nodes, connectors);
     setData(flowchart.getData());
@@ -26,6 +26,7 @@ export const FlowchartPrimary: FC = () => {
     <div className="App">
       <input type='text' value={txt} onChange={e => setTxt(e.target.value)} />
       <button onClick={() => { flowchart!.addRectNode(100, 100, txt) }}>Add Rectangle Node</button>
+      <button onClick={() => { flowchart!.addCircleNode(100, 100, txt) }}>Add Circle Node</button>
       <button onClick={() => { setData(flowchart!.getData()) }}>Get Nodes and Connections</button>
       <div>
         <Flowchart setHandles={setHandles} width='700px' height='400px' onReady={onReady} />
