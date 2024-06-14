@@ -7,6 +7,11 @@ export class RectNode extends Node {
     super(id, left, top, text)
   }
 
+  getHorizon(origin: Point, dest: Point): Point {
+    let d = [(dest.X - origin.X) / 3, (dest.Y - origin.Y) / 3], sign = d[0] > 0 ? 1 : -1, v = [sign * d[1] / 6, -sign * d[0] / 6];
+    return { X: origin.X + d[0] + v[0], Y: origin.Y + d[1] + v[1] };
+  }
+
   center(): Point {
     return { X: this.left + this.width / 2, Y: this.top + this.height / 2 };
   }

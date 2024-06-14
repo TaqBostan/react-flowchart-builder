@@ -7,6 +7,12 @@ export class CircleNode extends Node {
     super(id, left, top, text)
   }
 
+  getHorizon(origin: Point, dest: Point): Point {
+    let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)), center = this.center(),
+      vector = [origin.X - center.X, origin.Y - center.Y];
+    return { X: origin.X + vector[0] * distance / this.radius / 3, Y: origin.Y + vector[1] * distance / this.radius / 3 };
+  }
+
   center(): Point {
     return { X: this.left + this.radius, Y: this.top + this.radius };
   }

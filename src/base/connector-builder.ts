@@ -128,7 +128,7 @@ export default class ConnectorBuilder {
 
   source_mm(e: MouseEvent) {
     if (e.button === 0 && this.origin)
-      this.sourceNode!.pointer!.setAttribute('d', ConnHelper.connInfo(this.origin, { X: e.offsetX, Y: e.offsetY }).path);
+      this.sourceNode!.pointer!.setAttribute('d', ConnHelper.pointerInfo(this.origin, { X: e.offsetX, Y: e.offsetY }).path);
   }
 
   updateAllConn(node: Node) {
@@ -137,18 +137,23 @@ export default class ConnectorBuilder {
 
   updateConn(node: Node, side: Side) {
     node.connectors.filter(c => c.side.equal(side)).forEach(connector => {
-      let p1 = connector.point, p2 = connector.nextNode.connectors.find(c => c.id === connector.id)!.point;
-      let pathD: string;
-      if (connector.self) pathD = ConnHelper.roundPath(p1);
-      else {
-        let { path, curve } = ConnHelper.connInfo(p1, p2);
-        pathD = path;
-        let origin = connector.toDest ? p1 : p2, dest = connector.toDest ? p2 : p1;
-        let fi = Math.atan2(dest.Y - origin.Y, dest.X - origin.X) * 180 / Math.PI + curve * (connector.toDest ? 1 : -1) * 10;
-        connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${fi})`);
+      let p1 = connector.point, connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!, p2 = connector2.point;
+      let pathD: string, labelPoint: Point;
+      if (connector.self) {
+        pathD = ConnHelper.roundPath(p1);
+        labelPoint = { X: p1.X, Y: p1.Y - 42 };
       }
-      let p: Point = connector.self ? { X: p1.X, Y: p1.Y - 42 } : ConnHelper.labelPoint(p1, p2), lbl = connector.label;
-      lbl.g.setAttribute('transform',`translate(${p.X - lbl.size.X / 2},${p.Y - lbl.size.Y / 2})`);
+      else {
+        let h1 = connector.horizon = node.getHorizon(p1, p2);
+        let h2 = connector2.horizon = connector.nextNode.getHorizon(p2, p1);
+        pathD = ConnHelper.connInfo(p1, p2, h1, h2);
+        let phi = connector.toDest ? Math.atan2(p2.Y - h2.Y, p2.X - h2.X) : Math.atan2(p1.Y - h1.Y, p1.X - h1.X);
+        let dest = connector.toDest ? p2 : p1;
+        connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${phi * 180 / Math.PI})`);
+        labelPoint = { X: (h1.X + h2.X + p1.X + p2.X) / 4, Y: (h1.Y + h2.Y + p1.Y + p2.Y) / 4 };
+      }
+      let lbl = connector.label;
+      lbl.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);
       connector.path.setAttribute('d', pathD);
     });
   }
