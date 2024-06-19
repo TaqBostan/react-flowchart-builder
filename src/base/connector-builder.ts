@@ -51,7 +51,6 @@ export default class ConnectorBuilder {
         label: connLabel,
         arrow,
         nextNode: node,
-        point: { X: 0, Y: 0 },
         slope: 0,
         side: sideOrigin,
         self,
@@ -62,7 +61,7 @@ export default class ConnectorBuilder {
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let side = node.connSide(originNode);
-        let conn = { ...originConn, nextNode: originNode, point: { X: 0, Y: 0 }, side, toDest: !originConn.toDest }
+        let conn = { ...originConn, nextNode: originNode, side, toDest: !originConn.toDest, point: undefined }
         node.connectors.push(conn);
         node.arrangeSide(side);
         this.updateConn(node, side);
@@ -137,15 +136,17 @@ export default class ConnectorBuilder {
 
   updateConn(node: Node, side: Side) {
     node.connectors.filter(c => c.side.equal(side)).forEach(connector => {
-      let p1 = connector.point, connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!, p2 = connector2.point;
+      let p1 = connector.point!, connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!, p2 = connector2.point!;
       let pathD: string, labelPoint: Point;
       if (connector.self) {
         pathD = ConnHelper.roundPath(p1);
         labelPoint = { X: p1.X, Y: p1.Y - 42 };
       }
       else {
-        let h1 = connector.horizon = node.getHorizon(p1, p2);
-        let h2 = connector2.horizon = connector.nextNode.getHorizon(p2, p1);
+        let h1 = connector.horizon = node.getHorizon(connector.horizon, p1, p2);
+        let h2 = connector2.horizon = connector.nextNode.getHorizon(connector2.horizon, p2, p1);
+        node.updatePoints(p1, h1, p2, h2);
+        connector.nextNode.updatePoints(p2, h2, p1, h1);
         pathD = ConnHelper.connInfo(p1, p2, h1, h2);
         let phi = connector.toDest ? Math.atan2(p2.Y - h2.Y, p2.X - h2.X) : Math.atan2(p1.Y - h1.Y, p1.X - h1.X);
         let dest = connector.toDest ? p2 : p1;

@@ -10,7 +10,8 @@ export abstract class Node {
   abstract allSides(): Side[];
   abstract connSide(node2: Node): Side;
   abstract arrangeSide(side: Side): void;
-  abstract getHorizon(origin: Point, dest: Point): Point;
+  abstract getHorizon(prevHrz: Point | undefined, origin: Point, dest: Point): Point;
+  abstract updatePoints(p: Point, hrz: Point, p2: Point, hrz2: Point): void;
   constructor(public id: number, public left: number, public top: number, public text: string) {
   }
 
@@ -44,7 +45,7 @@ export type Connector = {
   label: { g: SVGGElement, size: Point },
   arrow?: SVGPathElement,
   nextNode: Node,
-  point: Point,
+  point?: Point,
   horizon?: Point,
   slope: number,
   side: Side,
