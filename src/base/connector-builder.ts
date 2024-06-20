@@ -42,10 +42,9 @@ export default class ConnectorBuilder {
       group.append(path);
       if (!self) group.append(arrow!);
       this.svg.append(group);
-      let id = ++this.maxId;
-      let connLabel = ConnHelper.addLabel(label || ('conn_' + id), group);
+      let connLabel = ConnHelper.addLabel(group, label);
       let originConn: Connector = {
-        id,
+        id: ++this.maxId,
         group,
         path,
         label: connLabel,
@@ -151,7 +150,7 @@ export default class ConnectorBuilder {
         let phi = connector.toDest ? Math.atan2(p2.Y - h2.Y, p2.X - h2.X) : Math.atan2(p1.Y - h1.Y, p1.X - h1.X);
         let dest = connector.toDest ? p2 : p1;
         connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${phi * 180 / Math.PI})`);
-        labelPoint = { X: (h1.X + h2.X + p1.X + p2.X) / 4, Y: (h1.Y + h2.Y + p1.Y + p2.Y) / 4 };
+        labelPoint = { X: (p1.X + 3 * h1.X + 3 * h2.X + p2.X) / 8, Y: (p1.Y + 3 * h1.Y + 3 * h2.Y + p2.Y) / 8 };
       }
       let lbl = connector.label;
       lbl.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);

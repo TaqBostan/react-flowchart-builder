@@ -10,13 +10,15 @@ export const FlowchartPrimary: FC = () => {
   const [data, setData] = React.useState<{ nodes: NodeData[], connectors: ConnectorData[] }>({ nodes: [], connectors: [] });
 
   const onReady = (flowchart: FlowchartHandles) => {
-    let nodes = [
-      { X: 50, Y: 50, text: 'node2', id: 1, shape: 'circle' },
-      { X: 150, Y: 50, text: 'node2', id: 2 },
+    let nodes = [ 
+      { id: 2, X: 443, Y: 69, text: "node2" }, 
+      { id: 1, X: 50, Y: 50, text: "node2", shape: "circle" }, 
+      { id: 3, X: 478, Y: 250, text: "node", shape: "circle" } 
     ];
     let connectors = [
       { from: 1, to: 2, text: 'label 1' },
       { from: 2, to: 2, text: 'label 2' },
+      { from: 1, to: 3 }
     ];
     flowchart.addNodes(nodes, connectors);
     setData(flowchart.getData());

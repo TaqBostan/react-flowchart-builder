@@ -23,26 +23,33 @@ export default class ConnectionHelper {
     return c;
   }
 
-  static addLabel(text: string, container: SVGGElement) {
+  static addLabel(container: SVGGElement, text?: string) {
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-    let txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
     let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
-    txt.innerHTML = text;
-    txt.setAttribute('text-anchor', 'middle');
-    txt.setAttribute('class', 'grabbable label-text');
-
+    let txt: SVGTextElement;
+    let size: Point;
+    
     box.setAttribute('rx', '3');
     box.setAttribute('ry', '3');
     box.setAttribute('class', 'grabbable label-box');
 
-    g.append(box, txt);
+    g.append(box);
     container.append(g);
 
-    let bbox = txt.getBBox();
-    let width = Math.max(bbox.width, 14);
-    let size: Point = { X: width + 6, Y: bbox.height + 4 };
-    txt.setAttribute('x', (width / 2 + 3).toString());
-    txt.setAttribute('y', (bbox.height - 1).toString());
+    if(text) {
+      txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
+      txt.innerHTML = text;
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('class', 'grabbable label-text');
+      g.append(txt);
+      let bbox = txt.getBBox();
+      let width = Math.max(bbox.width, 14);
+      size = { X: width + 6, Y: bbox.height + 4 };
+      txt.setAttribute('x', (width / 2 + 3).toString());
+      txt.setAttribute('y', (bbox.height - 1).toString());
+    }
+    else size = { X: 12, Y: 8 };
+
     box.setAttribute('height', size.Y.toString());
     box.setAttribute('width', size.X.toString());
 
