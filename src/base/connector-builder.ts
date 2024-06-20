@@ -142,15 +142,15 @@ export default class ConnectorBuilder {
         labelPoint = { X: p1.X, Y: p1.Y - 42 };
       }
       else {
-        let h1 = connector.horizon = node.getHorizon(connector.horizon, p1, p2);
-        let h2 = connector2.horizon = connector.nextNode.getHorizon(connector2.horizon, p2, p1);
+        let h1 = connector.horizon = node.getHorizon(connector.horizon, p1, p2), hPoint1 = h1.point;
+        let h2 = connector2.horizon = connector.nextNode.getHorizon(connector2.horizon, p2, p1), hPoint2 = h2.point;
         node.updatePoints(p1, h1, p2, h2);
         connector.nextNode.updatePoints(p2, h2, p1, h1);
-        pathD = ConnHelper.connInfo(p1, p2, h1, h2);
-        let phi = connector.toDest ? Math.atan2(p2.Y - h2.Y, p2.X - h2.X) : Math.atan2(p1.Y - h1.Y, p1.X - h1.X);
+        pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
+        let phi = connector.toDest ? Math.atan2(p2.Y - hPoint2.Y, p2.X - hPoint2.X) : Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
         let dest = connector.toDest ? p2 : p1;
         connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${phi * 180 / Math.PI})`);
-        labelPoint = { X: (p1.X + 3 * h1.X + 3 * h2.X + p2.X) / 8, Y: (p1.Y + 3 * h1.Y + 3 * h2.Y + p2.Y) / 8 };
+        labelPoint = { X: (p1.X + 3 * hPoint1.X + 3 * hPoint2.X + p2.X) / 8, Y: (p1.Y + 3 * hPoint1.Y + 3 * hPoint2.Y + p2.Y) / 8 };
       }
       let lbl = connector.label;
       lbl.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);

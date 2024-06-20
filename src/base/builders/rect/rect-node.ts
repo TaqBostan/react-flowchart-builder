@@ -1,5 +1,5 @@
 
-import { Node, Point, Side } from "../../types";
+import { Horizon, Node, Point, Side } from "../../types";
 
 export class RectNode extends Node {
   box: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
@@ -7,12 +7,17 @@ export class RectNode extends Node {
     super(id, left, top, text)
   }
 
-  getHorizon(prevHrz: Point | undefined, origin: Point, dest: Point): Point {
-    let d = [(dest.X - origin.X) / 3, (dest.Y - origin.Y) / 3], sign = d[0] > 0 ? 1 : -1, v = [sign * d[1] / 6, -sign * d[0] / 6];
-    return { X: origin.X + d[0] + v[0], Y: origin.Y + d[1] + v[1] };
+  getHorizon(prevHrz: Horizon | undefined, origin: Point, dest: Point): Horizon {
+    if (prevHrz === undefined) prevHrz = { point: { X: 0, Y: 0 }, ratioH: 1 / 3, ratioV: 1 / 6 }
+    let horizontal = [(dest.X - origin.X) * prevHrz.ratioH, (dest.Y - origin.Y) * prevHrz.ratioH],
+      sign = horizontal[0] > 0 ? 1 : -1,
+      vertical = [sign * horizontal[1] * prevHrz.ratioV, -sign * horizontal[0] * prevHrz.ratioV];
+    prevHrz.point.X = origin.X + horizontal[0] + vertical[0];
+    prevHrz.point.Y = origin.Y + horizontal[1] + vertical[1];
+    return prevHrz;
   }
-  
-  updatePoints(p: Point, hrz: Point, p2: Point, hrz2: Point) {
+
+  updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {
   }
 
   center(): Point {
