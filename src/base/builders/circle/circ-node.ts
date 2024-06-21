@@ -46,8 +46,8 @@ export class CircleNode extends Node {
   arrangeSide(side: CircleSide) {
     let center = this.center();
     this.connectors.forEach(connector => {
-      if (connector.point !== undefined) return;
       if (connector.self) connector.point = { X: center.X, Y: center.Y - this.radius };
+      else if (connector.point !== undefined) return;
       else {
         let nextCenter = connector.nextNode.center();
         let distance = Math.sqrt(Math.pow(nextCenter.X - center.X, 2) + Math.pow(nextCenter.Y - center.Y, 2));

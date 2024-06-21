@@ -139,7 +139,7 @@ export default class ConnectorBuilder {
       let pathD: string, labelPoint: Point;
       if (connector.self) {
         pathD = ConnHelper.roundPath(p1);
-        labelPoint = { X: p1.X, Y: p1.Y - 42 };
+        labelPoint = { X: p1.X, Y: p1.Y - 43 };
       }
       else {
         node.setHorizon(connector, p1, p2);

@@ -13,7 +13,8 @@ export default class ConnectionHelper {
   }
 
   static roundPath(point: Point): string {
-    return `M${point.X - 5},${point.Y}l10-3.5a15,20,0,1,0-10,0l10,3.5`;
+    let {X, Y} = point;
+    return `M${X},${Y}l5-5a12,20,0,1,0-10,0l5,5M${X - 8},${Y - 27}l-4,7l-4-7M${X + 8},${Y -20}l4-7l4,7`;
   }
 
   static createConnector(): SVGPathElement {
