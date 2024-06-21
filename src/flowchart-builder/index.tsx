@@ -36,7 +36,7 @@ const Flowchart = (props: FlowchartProps) => {
   })
 
   const onload = React.useCallback((svg: SVGSVGElement) => {
-    Director.init(svg);
+    Director.init(svg, props.editable);
     props.setHandles({ ...getHandles(), svg });
     props.onReady?.({ ...getHandles(), svg });
   }, []);
@@ -60,6 +60,7 @@ export interface FlowchartProps {
   height?: string;
   width?: string;
   margin?: string;
+  editable?: boolean;
   onReady?: (annotator: FlowchartHandles) => any;
   setHandles: (handles: FlowchartHandles) => void;
 }

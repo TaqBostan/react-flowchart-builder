@@ -30,13 +30,15 @@ export default abstract class NodeBuilder<N extends Node> {
     n.label.setAttribute('class', 'no-select');
     n.label.innerHTML = n.text;
 
-    n.source.setAttribute('class', 'source pointer');
-    n.source.setAttribute('height', '12');
-    n.source.setAttribute('width', '12');
-    n.source.setAttribute('stroke', 'black');
-    n.source.setAttribute('stroke-width', '0.5');
-    n.source.setAttribute('rx', '3');
-    n.source.setAttribute('fill', 'orange');
+    if (ConnectorBuilder.editable) {
+      n.source.setAttribute('class', 'source pointer');
+      n.source.setAttribute('height', '12');
+      n.source.setAttribute('width', '12');
+      n.source.setAttribute('stroke', 'black');
+      n.source.setAttribute('stroke-width', '0.5');
+      n.source.setAttribute('rx', '3');
+      n.source.setAttribute('fill', 'orange');
+    }
 
     this.setSize(n);
     return n;

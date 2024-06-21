@@ -24,7 +24,7 @@ export default class ConnectionHelper {
     return c;
   }
 
-  static addLabel(container: SVGGElement, text?: string) {
+  static addLabel(container: SVGGElement, editable: boolean, text?: string) {
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
     let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
     let txt: SVGTextElement;
@@ -32,7 +32,8 @@ export default class ConnectionHelper {
     
     box.setAttribute('rx', '3');
     box.setAttribute('ry', '3');
-    box.setAttribute('class', 'grabbable label-box');
+    box.classList.add('label-box');
+    if (editable) box.classList.add('grabbable');
 
     g.append(box);
     container.append(g);
@@ -41,7 +42,8 @@ export default class ConnectionHelper {
       txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
       txt.innerHTML = text;
       txt.setAttribute('text-anchor', 'middle');
-      txt.setAttribute('class', 'grabbable label-text');
+      txt.classList.add('label-text');
+      if (editable) txt.classList.add('grabbable');
       g.append(txt);
       let bbox = txt.getBBox();
       let width = Math.max(bbox.width, 14);

@@ -2,6 +2,7 @@ import ConnHelper from './connection-helper';
 import { Connector, Node, Point, Side } from './types'
 
 export default class ConnectorBuilder {
+  static editable: boolean;
   maxId: number = 0;
   origin?: Point;
   sourceNode?: Node;
@@ -42,7 +43,7 @@ export default class ConnectorBuilder {
       group.append(path);
       if (!self) group.append(arrow!);
       this.svg.append(group);
-      let connLabel = ConnHelper.addLabel(group, label);
+      let connLabel = ConnHelper.addLabel(group, ConnectorBuilder.editable, label);
       let originConn: Connector = {
         id: ++this.maxId,
         group,
@@ -56,7 +57,7 @@ export default class ConnectorBuilder {
         toDest: true
       }
       originNode.connectors.push(originConn);
-      connLabel.g.onmousedown = (event: MouseEvent) => this.label_md(event, originNode, originConn);
+      if (ConnectorBuilder.editable) connLabel.g.onmousedown = (event: MouseEvent) => this.label_md(event, originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let side = node.connSide(originNode);

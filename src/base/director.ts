@@ -56,7 +56,8 @@ export default class Director {
     return node.id;
   }
 
-  static init(container: SVGSVGElement) {
+  static init(container: SVGSVGElement, editable: boolean = false) {
     Director.instance = new Director(container);
+    ConnectorBuilder.editable = editable;
   }
 }

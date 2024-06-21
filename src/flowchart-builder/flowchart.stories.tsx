@@ -24,7 +24,7 @@ export const FlowchartPrimary: FC = () => {
       <button onClick={() => { flowchart!.addRhomNode(100, 100, txt) }}>Add Rhombus Node</button>
       <button onClick={() => { setData(flowchart!.getData()) }}>Get Nodes and Connections</button>
       <div>
-        <Flowchart setHandles={setHandles} width='700px' height='400px' onReady={onReady} />
+        <Flowchart setHandles={setHandles} width='700px' editable={true} height='400px' onReady={onReady} />
       </div>
       <h3>Nodes:</h3>
       <div>{JSON.stringify(data.nodes, null, 2)}</div>
