@@ -1,19 +1,19 @@
 
-import { Horizon, Node, Point, Side } from "../../types";
+import { Connector, Horizon, Node, Point, Side } from "../../types";
 import Util from "../../util";
 
 export class CircleNode extends Node {
   box: SVGCircleElement = document.createElementNS("http://www.w3.org/2000/svg", 'circle') as SVGCircleElement;
   constructor(public id: number, public left: number, public top: number, public text: string, public radius: number = 0) {
-    super(id, left, top, text)
+    super(id, left, top, text, 'circle')
   }
 
-  getHorizon(prevHrz: Horizon | undefined, origin: Point, dest: Point): Horizon {
-    if (prevHrz !== undefined) return prevHrz;
+  setHorizon(conn: Connector, origin: Point, dest: Point): void {
+    if (conn.horizon !== undefined) return;
     let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)), center = this.center(),
       vector = [origin.X - center.X, origin.Y - center.Y];
     let point = { X: origin.X + vector[0] * distance / this.radius / 3, Y: origin.Y + vector[1] * distance / this.radius / 3 };
-    return { point, ratioH: 0, ratioV: 0 }
+    conn.horizon = { point, ratioH: 0, ratioV: 0 };
   }
 
   updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {

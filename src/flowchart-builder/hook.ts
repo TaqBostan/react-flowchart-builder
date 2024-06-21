@@ -9,6 +9,7 @@ export const useFlowchart = () => {
 export type FlowchartHandles = {
   addRectNode(left: number, top: number, text: string, id?: number): number;
   addCircleNode(left: number, top: number, text: string, id?: number): number;
+  addRhomNode(left: number, top: number, text: string, id?: number): number;
   addNodes(nodes: NodeData[], conns?: ConnectorData[]): void;
   getData(): { nodes: NodeData[], connectors: ConnectorData[] }
   svg: SVGSVGElement;

@@ -1,5 +1,6 @@
 import CircleBuilder from "./builders/circle/circ-builder";
 import RectBuilder from "./builders/rect/rect-builder";
+import RhomBuilder from "./builders/rhom/rhom-builder";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
 import { ConnectorData, Node } from "./types";
@@ -12,7 +13,7 @@ export default class Director {
 
   constructor(public svg: SVGSVGElement) {
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
-    this.builders = [new RectBuilder(svg, this.connBuilder), new CircleBuilder(svg, this.connBuilder)];
+    this.builders = [new RectBuilder(svg, this.connBuilder), new CircleBuilder(svg, this.connBuilder), new RhomBuilder(svg, this.connBuilder)];
   }
 
   getBuilder<T extends Node>(node: T): NodeBuilder<T> {
@@ -34,9 +35,12 @@ export default class Director {
 
   getData() {
     return {
-      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text })),
+      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape })),
       connectors: this.nodes.reduce(
-        (conns: ConnectorData[], node) => [...conns, ...node.connectors.filter(n => n.toDest).map(conn => ({ from: node.id, to: conn.nextNode.id }))],
+        (conns: ConnectorData[], node) => [...conns,
+        ...node.connectors
+          .filter(n => n.toDest)
+          .map(conn => ({ from: node.id, to: conn.nextNode.id, text: conn.label.text }))],
         []
       )
     }

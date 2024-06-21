@@ -142,8 +142,10 @@ export default class ConnectorBuilder {
         labelPoint = { X: p1.X, Y: p1.Y - 42 };
       }
       else {
-        let h1 = connector.horizon = node.getHorizon(connector.horizon, p1, p2), hPoint1 = h1.point;
-        let h2 = connector2.horizon = connector.nextNode.getHorizon(connector2.horizon, p2, p1), hPoint2 = h2.point;
+        node.setHorizon(connector, p1, p2);
+        connector.nextNode.setHorizon(connector2, p2, p1);
+        let h1 = connector.horizon!, hPoint1 = h1.point;
+        let h2 = connector2.horizon!, hPoint2 = h2.point;
         node.updatePoints(p1, h1, p2, h2);
         connector.nextNode.updatePoints(p2, h2, p1, h1);
         pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);

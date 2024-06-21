@@ -31,7 +31,6 @@ export default abstract class NodeBuilder<N extends Node> {
     n.label.innerHTML = n.text;
 
     n.source.setAttribute('class', 'source pointer');
-    n.source.setAttribute('y', '19.5');
     n.source.setAttribute('height', '12');
     n.source.setAttribute('width', '12');
     n.source.setAttribute('stroke', 'black');

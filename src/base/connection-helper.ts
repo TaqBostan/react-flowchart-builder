@@ -53,7 +53,7 @@ export default class ConnectionHelper {
     box.setAttribute('height', size.Y.toString());
     box.setAttribute('width', size.X.toString());
 
-    return { g, size };
+    return { g, size, text };
   }
 
   static createArrow(): SVGPathElement {
