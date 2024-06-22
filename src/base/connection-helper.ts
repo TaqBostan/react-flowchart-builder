@@ -26,16 +26,17 @@ export default class ConnectionHelper {
 
   static addLabel(container: SVGGElement, editable: boolean, text?: string) {
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-    let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
-    let txt: SVGTextElement;
-    let size: Point;
+    let txt: SVGTextElement, size: Point, box: SVGRectElement | undefined;
     
-    box.setAttribute('rx', '3');
-    box.setAttribute('ry', '3');
-    box.classList.add('label-box');
-    if (editable) box.classList.add('grabbable');
+    if(editable || text) {
+      box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      box.setAttribute('rx', '3');
+      box.setAttribute('ry', '3');
+      box.classList.add('label-box');
+      if (editable) box.classList.add('grabbable');
+      g.append(box);
+    }
 
-    g.append(box);
     container.append(g);
 
     if(text) {
@@ -51,10 +52,11 @@ export default class ConnectionHelper {
       txt.setAttribute('x', (width / 2 + 3).toString());
       txt.setAttribute('y', (bbox.height - 1).toString());
     }
-    else size = { X: 12, Y: 8 };
+    else if(editable) size = { X: 12, Y: 8 };
+    else size = { X: 0, Y: 0 };
 
-    box.setAttribute('height', size.Y.toString());
-    box.setAttribute('width', size.X.toString());
+    box?.setAttribute('height', size.Y.toString());
+    box?.setAttribute('width', size.X.toString());
 
     return { g, size, text };
   }

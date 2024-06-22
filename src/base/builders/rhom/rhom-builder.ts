@@ -9,6 +9,7 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
   setSize(n: RhomNode): void {
     n.box.setAttribute('x', '0');
     n.box.setAttribute('y', '0');
+    n.box.setAttribute('stroke-width', '1.2');
     n.diameter = 30 + Math.max(20, n.label.getBBox().width);
     let points = [[0, n.diameter/2], [n.diameter/2, 0], [n.diameter, n.diameter/2], [n.diameter/2, n.diameter]];
     let strPoints = points.reduce((str, point) => `${str} ${point[0]},${point[1]}`, '');

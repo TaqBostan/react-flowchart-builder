@@ -1,5 +1,15 @@
 A lightweight component to design flowcharts. Check out the [demo](https://d5y3kk.csb.app/) for some examples.
 
+## Features
+
+- Different shapes of nodes.
+- Add/Remove links between nodes using the mouse
+- Enable/Disable adding/removing links
+- Drag nodes
+- Raw or typed input/output
+
+![Screenshot of ImageAnnotator](https://github.com/TaqBostan/content/blob/main/flowchart.png?raw=true)
+
 ## Usage
 
 Install `react-flowchart-builder` using npm.
@@ -22,10 +32,10 @@ const { setHandles, flowchart } = useFlowchart();
 
 ```js
 <button onClick={() => { flowchart.addNode(50, 50, 'my node') }}>Add Node</button>
-<Flowchart setHandles={setHandles} width='700px' height='400px' />
+<Flowchart setHandles={setHandles} width='700px' height='400px' editable={true} />
 ```
 
-By clicking the button, a new node is added at `x = 50, y = 50`. Drag the orange square from one node to another to add connections.
+Clicking the button creates a new node at `x = 50, y = 50`. Drag the orange square from one node to another to add connections.
 
 ## Loading/Saving a Flowchart
 
@@ -38,8 +48,8 @@ const load = () => {
     { id: 2, text: 'node2', X: 150, Y: 50 },
   ];
   let connectors = [
-    { from: 1, to: 2, text: 'conn1' },
-    { from: 2, to: 2, text: 'conn2' },
+    { from: 1, to: 2 },
+    { from: 2, to: 2 },
   ];
   flowchart.addNodes(nodes, connectors);
 }
@@ -51,6 +61,45 @@ const save = () => console.log(flowchart.getData()) // { nodes: […], connector
 <button onClick={load}>Load</button>
 <button onClick={save}>Save</button>
 ```
+
+## Props
+
+The following props can be defined on `Flowchart`:
+
+| Prop | Type | Description | Default |
+|---|---|---|---|
+| `width` \* | `string` | Flowchart width |  |
+| `height` \* | `string` | Flowchart height |  |
+| `editable` | `boolean` | Enable/Disable adding/removing connectors (links between nodes) | `false` |
+| `onReady` | `FlowchartHandles => any` | When the flowchart is mounted |   |
+
+(\*) required props
+
+## Node
+
+Below is the data model for nodes:
+
+| Prop | Type | Description | Default |
+|---|---|---|---|
+| `id` | `number` | Node identifier |  |
+| `X` \* | `number` | The `x` position of the node |  |
+| `Y` \* | `number` | The `y` position of the node |  |
+| `text` \* | `string` | Node text |  |
+| `shape` | `string` | Node shape can be `rectangle`, `circle`, or `rhombus` | `rectangle` |
+
+(\*) required props
+
+## Connector
+
+Below is the data model for connectors (links between nodes):
+
+| Prop | Type | Description | Default |
+|---|---|---|---|
+| `from` \* | `number` | The `id` of the origin node |  |
+| `to` \* | `number` | The `id` of the destination node |  |
+| `text` | `string` | Connector label |  |
+
+(\*) required props
 
 ## Contributing
 

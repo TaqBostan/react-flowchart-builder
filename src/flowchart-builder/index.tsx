@@ -46,20 +46,17 @@ const Flowchart = (props: FlowchartProps) => {
   }, [wrapper, onload]);
 
   const style: CSSProperties = {
-    borderStyle: 'dotted',
-    position: 'relative'
+    position: 'relative',
+    height: props.height,
+    width: props.width
   };
-  if (props.margin) style.margin = props.margin;
-  if (props.height) style.height = props.height;
-  if (props.width) style.width = props.width;
 
   return <svg ref={wrapper} style={style}></svg>;
 }
 
 export interface FlowchartProps {
-  height?: string;
-  width?: string;
-  margin?: string;
+  height: string;
+  width: string;
   editable?: boolean;
   onReady?: (annotator: FlowchartHandles) => any;
   setHandles: (handles: FlowchartHandles) => void;
