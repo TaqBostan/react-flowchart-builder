@@ -6,7 +6,7 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
     return node instanceof CircleNode;
   }
   setSize(n: CircleNode): void {
-    n.radius = (20 + Math.max(20, n.label.getBBox().width)) / 2;
+    n.radius = (14 + Math.max(20, n.label.getBBox().width * 0.9)) / 2;
     n.box.setAttribute('r', n.radius.toString());
     n.box.setAttribute('cx', n.radius.toString());
     n.box.setAttribute('cy', n.radius.toString());

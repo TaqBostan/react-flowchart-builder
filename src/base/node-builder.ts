@@ -23,11 +23,8 @@ export default abstract class NodeBuilder<N extends Node> {
     n.box.setAttribute('stroke-width', '1');
     n.box.setAttribute('fill', 'transparent');
 
-    n.label.setAttribute('x', '10');
-    n.label.setAttribute('fill', 'black');
-    n.label.setAttribute('font-size', '16');
-    n.label.setAttribute('font-family', 'arial,sans-serif');
-    n.label.setAttribute('class', 'no-select');
+    n.label.setAttribute('x', '7');
+    n.label.setAttribute('class', 'no-select node-txt');
     n.label.innerHTML = n.text;
 
     if (ConnectorBuilder.editable) {

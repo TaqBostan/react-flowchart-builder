@@ -11,10 +11,10 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     n.box.setAttribute('y', '0');
     n.box.setAttribute('height', n.height.toString());
     n.box.setAttribute('rx', '5');
-    n.width = 20 + Math.max(20, n.label.getBBox().width);
+    n.width = 14 + Math.max(20, n.label.getBBox().width * 0.9);
     n.box.setAttribute('width', n.width.toString());
     n.source.setAttribute('x', (n.width - 20).toString());
-    n.source.setAttribute('y', '19.5');
-    n.label.setAttribute('y', (n.height / 2 + n.label.getBBox().height / 2 - 3.5).toString());
+    n.source.setAttribute('y', '9.5');
+    n.label.setAttribute('y', (n.height / 2 + n.label.getBBox().height / 2 - 2.5).toString());
   }
 }

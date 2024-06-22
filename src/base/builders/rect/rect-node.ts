@@ -3,7 +3,7 @@ import { Connector, Horizon, Node, Point, Side } from "../../types";
 
 export class RectNode extends Node {
   box: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
-  constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 50) {
+  constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 30) {
     super(id, left, top, text, 'rectangle')
   }
 
