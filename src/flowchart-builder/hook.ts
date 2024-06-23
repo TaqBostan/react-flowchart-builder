@@ -11,6 +11,7 @@ export type FlowchartHandles = {
   addCircleNode(left: number, top: number, text: string, id?: number): number;
   addRhomNode(left: number, top: number, text: string, id?: number): number;
   addNodes(nodes: NodeData[], conns?: ConnectorData[]): void;
-  getData(): { nodes: NodeData[], connectors: ConnectorData[] }
+  getData(): { nodes: NodeData[], connectors: ConnectorData[] };
+  changeConnType(id: number, type: string): void;
   svg: SVGSVGElement;
 }

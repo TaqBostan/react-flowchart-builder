@@ -4,14 +4,12 @@ import { FlowchartHandles, useFlowchart } from './hook';
 import { ConnectorData, NodeData } from '../base/types';
 
 export const FlowchartPrimary: FC = () => {
-
   const { setHandles, flowchart } = useFlowchart();
   const [txt, setTxt] = React.useState('node');
   const [data, setData] = React.useState<{ nodes: NodeData[], connectors: ConnectorData[] }>({ nodes: [], connectors: [] });
-
   const onReady = (flowchart: FlowchartHandles) => {
     let nodes = JSON.parse(`[ { "id": 2, "X": 204, "Y": 226, "text": "Check time", "shape": "rectangle" }, { "id": 4, "X": 418, "Y": 14, "text": "Take bus", "shape": "rectangle" }, { "id": 5, "X": 394, "Y": 432, "text": "Take subway", "shape": "rectangle" }, { "id": 1, "X": 14, "Y": 201, "text": "Leave home", "shape": "circle" }, { "id": 6, "X": 690, "Y": 213, "text": "Reach school", "shape": "circle" }, { "id": 3, "X": 383, "Y": 190, "text": "Before 7 am?", "shape": "rhombus" } ]`);
-    let connectors = JSON.parse(`[ { "from": 2, "to": 3 }, { "from": 4, "to": 6 }, { "from": 5, "to": 6 }, { "from": 1, "to": 2 }, { "from": 3, "to": 4, "text": "Yes" }, { "from": 3, "to": 5, "text": "No" }, { "from": 5, "to": 5 } ]`);
+    let connectors = JSON.parse(`[ { "from": 2, "to": 3, "type":"dashed" }, { "from": 4, "to": 6 }, { "from": 5, "to": 6 }, { "from": 1, "to": 2 }, { "from": 3, "to": 4, "text": "Yes" }, { "from": 3, "to": 5, "text": "No" }, { "from": 5, "to": 5 } ]`);
     flowchart.addNodes(nodes, connectors);
     setData(flowchart.getData());
   }
@@ -23,6 +21,10 @@ export const FlowchartPrimary: FC = () => {
       <button onClick={() => { flowchart!.addCircleNode(100, 100, txt) }}>Add Circle Node</button>
       <button onClick={() => { flowchart!.addRhomNode(100, 100, txt) }}>Add Rhombus Node</button>
       <button onClick={() => { setData(flowchart!.getData()) }}>Get Nodes and Connections</button>
+      <input type="radio" id="solid" name="connType" onClick={e => flowchart!.changeConnType(3,"solid")}/>
+      <label htmlFor="solid">Solid</label>
+      <input type="radio" id="dashed" name="connType" onClick={e => flowchart!.changeConnType(3,"dashed")}/>
+      <label htmlFor="dashed">Dashed</label>
       <div style={{ borderStyle: 'dotted', width: 'fit-content' }}>
         <Flowchart setHandles={setHandles} width='900px' height='500px' editable={true} onReady={onReady} />
       </div>

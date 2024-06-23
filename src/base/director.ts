@@ -1,9 +1,10 @@
 import CircleBuilder from "./builders/circle/circ-builder";
 import RectBuilder from "./builders/rect/rect-builder";
 import RhomBuilder from "./builders/rhom/rhom-builder";
+import ConnectionHelper from "./connection-helper";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
-import { ConnectorData, Node, Point } from "./types";
+import { Connector, ConnectorData, Node, Point } from "./types";
 
 export default class Director {
   static instance: Director;
@@ -66,7 +67,7 @@ export default class Director {
       let origin = this.nodes.find(n => n.id === connector.from), destination = this.nodes.find(n => n.id === connector.to);
       if (!origin || !destination) throw Error('Node from/to not found!');
       this.connBuilder.sourceNode = origin;
-      this.connBuilder.connect(destination, connector.text);
+      this.connBuilder.connect(destination, connector.text, connector.type);
     });
   }
 
@@ -77,10 +78,21 @@ export default class Director {
         (conns: ConnectorData[], node) => [...conns,
         ...node.connectors
           .filter(n => n.toDest)
-          .map(conn => ({ from: node.id, to: conn.nextNode.id, text: conn.label.text }))],
+          .map(conn => ({ id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label.text, type: conn.type }))],
         []
       )
     }
+  }
+
+  changeConnType(id: number, type: string) {
+    this.nodes
+      .reduce((conns: Connector[], node) => [...conns, ...node.connectors
+        .filter(conn => conn.id === id)], [])
+      .forEach(connector => {
+        connector.type = type;
+        if (connector.arrow) ConnectionHelper.setArrow(connector.arrow, type);
+        ConnectionHelper.setStroke(connector.path, type);
+      });
   }
 
   addNode(node: Node): number {

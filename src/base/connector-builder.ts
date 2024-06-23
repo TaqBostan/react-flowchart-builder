@@ -31,15 +31,15 @@ export default class ConnectorBuilder {
     }
   }
 
-  connect(node: Node, label?: string) {
+  connect(node: Node, label?: string, type: string = 'solid') {
     if (this.sourceNode) {
       let originNode = this.sourceNode;
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let sideOrigin = originNode.connSide(node);
       let group = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-      let path = ConnHelper.createConnector();
-      let arrow = !self ? ConnHelper.createArrow() : undefined;
+      let path = ConnHelper.createConnector(type);
+      let arrow = !self ? ConnHelper.createArrow(type) : undefined;
       group.append(path);
       if (!self) group.append(arrow!);
       this.svg.append(group);
@@ -54,7 +54,8 @@ export default class ConnectorBuilder {
         slope: 0,
         side: sideOrigin,
         self,
-        toDest: true
+        toDest: true,
+        type: type
       }
       originNode.connectors.push(originConn);
       if (ConnectorBuilder.editable) connLabel.g.onmousedown = (event: MouseEvent) => this.label_md(event, originNode, originConn);

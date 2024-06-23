@@ -1,4 +1,4 @@
-import { Point, Node } from './types'
+import { Point } from './types'
 
 export default class ConnectionHelper {
   static connInfo(a: Point, b: Point, h1: Point, h2: Point) {
@@ -13,22 +13,33 @@ export default class ConnectionHelper {
   }
 
   static roundPath(point: Point): string {
-    let {X, Y} = point;
-    return `M${X},${Y}l5-5a12,20,0,1,0-10,0l5,5M${X - 6.5},${Y - 35}l-5,6l-1-7.8M${X + 6.5},${Y -12}l5-6l1+7.8`;
+    let { X, Y } = point;
+    return `M${X},${Y}l5-5a12,20,0,1,0-10,0l5,5M${X - 6.5},${Y - 35}l-5,6l-1-7.8M${X + 6.5},${Y - 12}l5-6l1+7.8`;
   }
 
-  static createConnector(): SVGPathElement {
+  static createConnector(type: string): SVGPathElement {
     let c = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
     c.setAttribute("class", "connector");
-    c.setAttribute("stroke", "green");
+    this.setStroke(c, type);
     return c;
+  }
+
+  static setStroke(path: SVGPathElement, type: string) {
+    if (type === 'solid') {
+      path.setAttribute("stroke", "green");
+      path.removeAttribute("stroke-dasharray");
+    }
+    else if (type === 'dashed') {
+      path.setAttribute("stroke-dasharray", "6");
+      path.setAttribute("stroke", "gray");
+    }
   }
 
   static addLabel(container: SVGGElement, editable: boolean, text?: string) {
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
     let txt: SVGTextElement, size: Point, box: SVGRectElement | undefined;
-    
-    if(editable || text) {
+
+    if (editable || text) {
       box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
       box.setAttribute('rx', '3');
       box.setAttribute('ry', '3');
@@ -39,7 +50,7 @@ export default class ConnectionHelper {
 
     container.append(g);
 
-    if(text) {
+    if (text) {
       txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
       txt.innerHTML = text;
       txt.setAttribute('text-anchor', 'middle');
@@ -52,7 +63,7 @@ export default class ConnectionHelper {
       txt.setAttribute('x', (width / 2 + 3).toString());
       txt.setAttribute('y', (bbox.height - 1).toString());
     }
-    else if(editable) size = { X: 12, Y: 8 };
+    else if (editable) size = { X: 12, Y: 8 };
     else size = { X: 0, Y: 0 };
 
     box?.setAttribute('height', size.Y.toString());
@@ -61,13 +72,20 @@ export default class ConnectionHelper {
     return { g, size, text };
   }
 
-  static createArrow(): SVGPathElement {
+  static createArrow(type: string): SVGPathElement {
     let a = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
-    a.setAttribute('fill', 'green');
+    this.setArrow(a, type);
     a.setAttribute('d', 'M0,0l-9,5v-10l9,5');
     return a;
   }
 
+  static setArrow(path: SVGPathElement, type: string) {
+    if (type === 'solid')
+      path.setAttribute('fill', 'green');
+    else if (type === 'dashed')
+      path.setAttribute('fill', 'gray');
+  }
+  
   static createPointer(): SVGPathElement {
     let p = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
     p.setAttribute("class", "connector");
