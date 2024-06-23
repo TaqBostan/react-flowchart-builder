@@ -77,6 +77,7 @@ export default class ConnectorBuilder {
       this.connector = connector;
       this.svg.onmousemove = (event: MouseEvent) => this.label_mm(event);
       this.svg.onmouseup = (event: MouseEvent) => this.label_mu(event);
+      e.stopPropagation();
     }
   }
 

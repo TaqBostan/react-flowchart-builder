@@ -58,3 +58,5 @@ export type Connector = {
 export type ConnectorData = { from: number, to: number, text?: string }
 
 export type Point = { X: number, Y: number }
+
+export type StaticData = { scale: number }

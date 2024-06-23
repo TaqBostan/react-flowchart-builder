@@ -29,12 +29,25 @@
   cursor: grab;
 }
 
-.grabbable:active {
+.wp-svg {
+  position: relative;
+  overflow: hidden;
+  cursor: move;
+}
+
+.wp-svg:active, .grabbable:active {
   cursor: grabbing;
 }
 
 .connectable:hover {
   stroke:rgb(34, 112, 79);
+}
+
+.the-svg {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: visible;
 }
 
 .connector {

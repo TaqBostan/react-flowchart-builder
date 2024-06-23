@@ -45,13 +45,16 @@ const Flowchart = (props: FlowchartProps) => {
     if (wrapper.current) onload(wrapper.current)
   }, [wrapper, onload]);
 
-  const style: CSSProperties = {
-    position: 'relative',
+  const wrapperCss: CSSProperties = {
     height: props.height,
     width: props.width
   };
 
-  return <svg ref={wrapper} style={style}></svg>;
+  return (
+    <div style={wrapperCss} className='wp-svg'>
+      <svg ref={wrapper} style={{ top: 0, left: 0 }} className='the-svg'></svg>
+    </div>
+  );
 }
 
 export interface FlowchartProps {

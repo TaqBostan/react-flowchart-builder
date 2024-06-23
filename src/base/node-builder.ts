@@ -1,6 +1,6 @@
 
 import ConnectorBuilder from './connector-builder';
-import { Node, Point } from './types'
+import { Node, Point, StaticData } from './types'
 
 export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
@@ -9,7 +9,7 @@ export default abstract class NodeBuilder<N extends Node> {
   abstract ofType<T extends Node>(node: T): boolean;
   abstract setSize(n: Node): void;
 
-  constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder) {
+  constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder, public sd: StaticData) {
   }
 
   add(n: Node): Node {
@@ -49,14 +49,15 @@ export default abstract class NodeBuilder<N extends Node> {
     if (e.button === 0 && !this.origin) {
       this.origin = { X: e.clientX, Y: e.clientY };
       this.node = node;
-      this.svg.onmousemove = (event: MouseEvent) => this.node_mm(event);
+      this.svg.parentElement!.onmousemove = (event: MouseEvent) => this.node_mm(event);
       node.group.onmouseup = (event: MouseEvent) => this.node_mu(event);
+      e.stopPropagation();
     }
   }
 
   node_mm(e: MouseEvent) {
     if (e.button === 0 && this.origin && this.node) {
-      this.node.move(this.node.left + e.clientX - this.origin.X, this.node.top + e.clientY - this.origin.Y);
+      this.node.move(this.node.left + (e.clientX - this.origin.X) / this.sd.scale, this.node.top + (e.clientY - this.origin.Y) / this.sd.scale);
       this.node.connectors.forEach(connector => {
         connector.side = this.node!.connSide(connector.nextNode);
         if (!connector.self) {

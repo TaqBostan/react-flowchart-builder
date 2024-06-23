@@ -3,17 +3,54 @@ import RectBuilder from "./builders/rect/rect-builder";
 import RhomBuilder from "./builders/rhom/rhom-builder";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
-import { ConnectorData, Node } from "./types";
+import { ConnectorData, Node, Point } from "./types";
 
 export default class Director {
   static instance: Director;
+  static sd = { scale: 1 };
   builders: NodeBuilder<Node>[];
   connBuilder: ConnectorBuilder;
   nodes: Node[] = [];
+  origin?: Point;
 
   constructor(public svg: SVGSVGElement) {
+    let parent = svg.parentElement!;
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
-    this.builders = [new RectBuilder(svg, this.connBuilder), new CircleBuilder(svg, this.connBuilder), new RhomBuilder(svg, this.connBuilder)];
+    this.builders = [new RectBuilder(svg, this.connBuilder, Director.sd), new CircleBuilder(svg, this.connBuilder, Director.sd), new RhomBuilder(svg, this.connBuilder, Director.sd)];
+    parent.onmousedown = (event: MouseEvent) => this.drag_md(event);
+    parent.addEventListener('mousewheel', (e: any) => this.mousewheel(e))
+  }
+
+  mousewheel(e: any) {
+    let scale = e.wheelDelta > 0 ? 1.25 : 0.8;
+    Director.sd.scale *= scale;
+    this.svg.style.transform = `scale(${Director.sd.scale})`
+    e.preventDefault();
+  }
+
+  drag_md(e: MouseEvent) {
+    if (e.button === 0 && !this.origin) {
+      let parent = this.svg.parentElement!;
+      this.origin = { X: e.clientX, Y: e.clientY };
+      parent.onmousemove = (event: MouseEvent) => this.drag_mm(event);
+      parent.onmouseup = (event: MouseEvent) => this.drag_mu(event);
+    }
+  }
+
+  drag_mm(e: MouseEvent) {
+    if (e.button === 0 && this.origin) {
+      this.svg.style.left = (parseFloat(this.svg.style.left) + (e.clientX - this.origin.X)) + 'px';
+      this.svg.style.top = (parseFloat(this.svg.style.top) + (e.clientY - this.origin.Y)) + 'px';
+      this.origin = { X: e.clientX, Y: e.clientY };
+    }
+  }
+
+  drag_mu(e: MouseEvent) {
+    if (e.button === 0 && this.origin) {
+      this.svg.parentElement!.onmousemove = null;
+      this.svg.parentElement!.onmouseup = null;
+      this.origin = undefined;
+    }
   }
 
   getBuilder<T extends Node>(node: T): NodeBuilder<T> {
@@ -59,5 +96,9 @@ export default class Director {
   static init(container: SVGSVGElement, editable: boolean = false) {
     Director.instance = new Director(container);
     ConnectorBuilder.editable = editable;
+  }
+
+  static setScale(scale: number) {
+    Director.sd.scale = scale;
   }
 }
