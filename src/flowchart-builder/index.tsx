@@ -32,6 +32,9 @@ const Flowchart = (props: FlowchartProps) => {
     },
     getData() {
       return getDirector().getData();
+    },
+    changeConnType(id: number, type: string){
+      getDirector().changeConnType(id, type);
     }
   })
 

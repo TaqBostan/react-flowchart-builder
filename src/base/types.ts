@@ -52,9 +52,10 @@ export type Connector = {
   slope: number,
   side: Side,
   self: boolean,
-  toDest: boolean
+  toDest: boolean,
+  type: string
 }
 
-export type ConnectorData = { from: number, to: number, text?: string }
+export type ConnectorData = { id?: number, from: number, to: number, text?: string, type?:string }
 
 export type Point = { X: number, Y: number }
