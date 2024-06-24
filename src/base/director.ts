@@ -19,11 +19,11 @@ export default class Director {
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
     this.builders = [new RectBuilder(svg, this.connBuilder, Director.sd), new CircleBuilder(svg, this.connBuilder, Director.sd), new RhomBuilder(svg, this.connBuilder, Director.sd)];
     parent.onmousedown = (event: MouseEvent) => this.drag_md(event);
-    parent.addEventListener('mousewheel', (e: any) => this.mousewheel(e))
+    parent.addEventListener('wheel', (e: WheelEvent) => this.mousewheel(e))
   }
 
-  mousewheel(e: any) {
-    let scale = e.wheelDelta > 0 ? 1.25 : 0.8;
+  mousewheel(e: WheelEvent) {
+    let scale = e.deltaY > 0 ? 1.25 : 0.8;
     Director.sd.scale *= scale;
     this.svg.style.transform = `scale(${Director.sd.scale})`
     e.preventDefault();

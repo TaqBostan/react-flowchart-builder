@@ -23,7 +23,7 @@ export default abstract class NodeBuilder<N extends Node> {
     n.box.setAttribute('stroke-width', '1');
     n.box.setAttribute('fill', 'transparent');
 
-    n.label.setAttribute('x', '7');
+    n.label.setAttribute('text-anchor', 'middle');
     n.label.setAttribute('class', 'no-select node-txt');
     n.label.innerHTML = n.text;
 
@@ -38,6 +38,8 @@ export default abstract class NodeBuilder<N extends Node> {
     }
 
     this.setSize(n);
+    n.label.setAttribute('x', ((n.box as any).getBBox().width / 2 - 1).toString());
+
     return n;
   }
 
