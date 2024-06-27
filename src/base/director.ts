@@ -23,7 +23,11 @@ export default class Director {
   }
 
   mousewheel(e: WheelEvent) {
+    let { clientWidth: w, clientHeight: h, offsetLeft, offsetTop } = (e.currentTarget as HTMLElement)
     let scale = e.deltaY > 0 ? 1.25 : 0.8;
+    let left = parseFloat(this.svg.style.left), top = parseFloat(this.svg.style.top);
+    this.svg.style.left = (left + (scale - 1) * (w / 2 + left - (e.pageX - offsetLeft))) + 'px';
+    this.svg.style.top = (top + (scale - 1) * (h / 2 + top - (e.pageY - offsetTop))) + 'px';
     Director.sd.scale *= scale;
     this.svg.style.transform = `scale(${Director.sd.scale})`
     e.preventDefault();
