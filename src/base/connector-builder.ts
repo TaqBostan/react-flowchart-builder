@@ -162,4 +162,11 @@ export default class ConnectorBuilder {
       connector.path.setAttribute('d', pathD);
     });
   }
+
+  setConnType(elem: SVGPathElement, type: string, isArrow: boolean) {
+    if (isArrow)
+      ConnHelper.setArrow(elem, type)
+    else
+      ConnHelper.setStroke(elem, type)
+  }
 }

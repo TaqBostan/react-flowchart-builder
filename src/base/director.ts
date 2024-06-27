@@ -1,7 +1,6 @@
 import CircleBuilder from "./builders/circle/circ-builder";
 import RectBuilder from "./builders/rect/rect-builder";
 import RhomBuilder from "./builders/rhom/rhom-builder";
-import ConnectionHelper from "./connection-helper";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
 import { Connector, ConnectorData, Node, Point } from "./types";
@@ -94,8 +93,8 @@ export default class Director {
         .filter(conn => conn.id === id)], [])
       .forEach(connector => {
         connector.type = type;
-        if (connector.arrow) ConnectionHelper.setArrow(connector.arrow, type);
-        ConnectionHelper.setStroke(connector.path, type);
+        if (connector.arrow) this.connBuilder.setConnType(connector.arrow, type, true);
+        this.connBuilder.setConnType(connector.path, type, false);
       });
   }
 
