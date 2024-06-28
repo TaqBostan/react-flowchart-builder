@@ -98,6 +98,9 @@ export default class ConnectorBuilder {
       this.updateAllConn(node);
       this.labelEvent(node, conn);
     }
+    input.onkeyup = (e: KeyboardEvent) => {
+      if(e.key === 'Enter') input.onblur?.(new FocusEvent('blur'));
+    }
   }
 
   label_md(e: MouseEvent, node: Node, connector: Connector) {
