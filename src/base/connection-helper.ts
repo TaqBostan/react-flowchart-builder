@@ -23,6 +23,21 @@ export default class ConnectionHelper {
     this.setStroke(c, type);
     return c;
   }
+  static createLabelInput(width: number, height: number, text: string | undefined) {
+    let f = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject') as SVGForeignObjectElement;
+    let div = document.createElement('div');
+    let input = document.createElement('input');
+    f.setAttribute("width", `${width}`);
+    f.setAttribute("height", `${height}`);
+    f.setAttribute("x", "1");
+    f.setAttribute("y", "1");
+    div.setAttribute("xmlns", 'http://www.w3.org/1999/xhtml');
+    if(text) input.value = text;
+    input.setAttribute("style", 'border:0;font-size:14px');
+    div.append(input);
+    f.append(div);
+    return {foreign: f, input};
+  }
 
   static setStroke(path: SVGPathElement, type: string) {
     if (type === 'solid') {
@@ -36,32 +51,31 @@ export default class ConnectionHelper {
   }
 
   static addLabel(container: SVGGElement, editable: boolean, text?: string) {
+    if (!editable && !text) return undefined;
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-    let txt: SVGTextElement, size: Point, box: SVGRectElement | undefined;
+    let elem: SVGTextElement | undefined, size: Point;
 
-    if (editable || text) {
-      box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-      box.setAttribute('rx', '3');
-      box.setAttribute('ry', '3');
-      box.classList.add('label-box');
-      if (editable) box.classList.add('grabbable');
-      g.append(box);
-    }
+    let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    box.setAttribute('rx', '3');
+    box.setAttribute('ry', '3');
+    box.classList.add('label-box');
+    if (editable) box.classList.add('grabbable');
 
+    g.append(box);
     container.append(g);
 
     if (text) {
-      txt = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
-      txt.innerHTML = text;
-      txt.setAttribute('text-anchor', 'middle');
-      txt.classList.add('label-text');
-      if (editable) txt.classList.add('grabbable');
-      g.append(txt);
-      let bbox = txt.getBBox();
+      elem = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
+      elem.innerHTML = text;
+      elem.setAttribute('text-anchor', 'middle');
+      elem.classList.add('label-text');
+      if (editable) elem.classList.add('grabbable');
+      g.append(elem);
+      let bbox = elem.getBBox();
       let width = Math.max(bbox.width, 14);
       size = { X: width + 6, Y: bbox.height + 4 };
-      txt.setAttribute('x', (width / 2 + 3).toString());
-      txt.setAttribute('y', (bbox.height - 1).toString());
+      elem.setAttribute('x', (width / 2 + 3).toString());
+      elem.setAttribute('y', (bbox.height - 1).toString());
     }
     else if (editable) size = { X: 12, Y: 8 };
     else size = { X: 0, Y: 0 };
@@ -69,7 +83,7 @@ export default class ConnectionHelper {
     box?.setAttribute('height', size.Y.toString());
     box?.setAttribute('width', size.X.toString());
 
-    return { g, size, text };
+    return { g, box, size, text, elem };
   }
 
   static createArrow(type: string): SVGPathElement {
@@ -85,7 +99,7 @@ export default class ConnectionHelper {
     else if (type === 'dashed')
       path.setAttribute('fill', 'gray');
   }
-  
+
   static createPointer(): SVGPathElement {
     let p = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
     p.setAttribute("class", "connector");

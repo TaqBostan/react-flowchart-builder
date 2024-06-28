@@ -82,7 +82,7 @@ export default class Director {
         (conns: ConnectorData[], node) => [...conns,
         ...node.connectors
           .filter(n => n.toDest)
-          .map(conn => ({ id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label.text, type: conn.type }))],
+          .map(conn => ({ id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type }))],
         []
       )
     }

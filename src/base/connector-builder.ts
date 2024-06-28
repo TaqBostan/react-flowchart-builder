@@ -58,7 +58,7 @@ export default class ConnectorBuilder {
         type: type
       }
       originNode.connectors.push(originConn);
-      if (ConnectorBuilder.editable) connLabel.g.onmousedown = (event: MouseEvent) => this.label_md(event, originNode, originConn);
+      if (ConnectorBuilder.editable) this.labelEvent(originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let side = node.connSide(originNode);
@@ -68,6 +68,35 @@ export default class ConnectorBuilder {
         this.updateConn(node, side);
       }
       this.updateConn(originNode, sideOrigin);
+    }
+  }
+
+  labelEvent(node: Node, conn: Connector) {
+    conn.label!.g.onmousedown = (event: MouseEvent) => this.label_md(event, node, conn);
+    conn.label!.g.ondblclick = () => this.label_dc(node, conn);
+  }
+
+  label_dc(node: Node, conn: Connector) {
+    let lbl = conn.label!, width = (lbl.elem?.getBBox().width || 30) + 6, height = 17;
+    lbl.elem?.remove();
+    lbl.box.setAttribute('width', (width + 2).toString());
+    lbl.box.setAttribute('height', (height + 2).toString());
+    let { foreign, input } = ConnHelper.createLabelInput(width, height, lbl.text);
+    lbl.g.append(foreign);
+    input.focus();
+    input.oninput = () => {
+      input.style.width = input.value.length + "ch";
+      foreign.setAttribute("width", `${input.offsetWidth}`);
+      lbl.box.setAttribute('width', `${input.offsetWidth + 2}`);
+    }
+    input.onblur = () => {
+      lbl.text = input.value;
+      foreign.remove();
+      lbl.g.remove()
+      let connLabel = ConnHelper.addLabel(conn.group, ConnectorBuilder.editable, lbl.text);
+      Object.assign(lbl, connLabel);
+      this.updateAllConn(node);
+      this.labelEvent(node, conn);
     }
   }
 
@@ -158,7 +187,7 @@ export default class ConnectorBuilder {
         labelPoint = { X: (p1.X + 3 * hPoint1.X + 3 * hPoint2.X + p2.X) / 8, Y: (p1.Y + 3 * hPoint1.Y + 3 * hPoint2.Y + p2.Y) / 8 };
       }
       let lbl = connector.label;
-      lbl.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);
+      lbl?.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);
       connector.path.setAttribute('d', pathD);
     });
   }
