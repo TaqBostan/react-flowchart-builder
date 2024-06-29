@@ -33,7 +33,7 @@ const Flowchart = (props: FlowchartProps) => {
     getData() {
       return getDirector().getData();
     },
-    changeConnType(id: number, type: string){
+    changeConnType(id: number, type: string) {
       getDirector().changeConnType(id, type);
     }
   })
@@ -55,7 +55,15 @@ const Flowchart = (props: FlowchartProps) => {
 
   return (
     <div style={wrapperCss} className='wp-svg'>
-      <svg ref={wrapper} style={{ top: 0, left: 0 }} className='the-svg'></svg>
+      <svg ref={wrapper} style={{ top: 0, left: 0 }} className='the-svg'>
+        <defs>
+          <filter id="f3" width="2" height="2">
+            <feOffset in="SourceAlpha" dx="1.5" dy="1.5" />
+            <feGaussianBlur stdDeviation="2" />
+            <feBlend in="SourceGraphic" in2="blurOut" />
+          </filter>
+        </defs>
+      </svg>
     </div>
   );
 }

@@ -47,6 +47,24 @@ export default abstract class NodeBuilder<N extends Node> {
     node.group.onmousedown = (event: MouseEvent) => this.node_md(event, node);
   }
 
+  clickable(node: Node) {
+    node.group.onclick = (event: MouseEvent) => this.node_c(event, node);
+  }
+
+  node_c(e: MouseEvent, node: Node) {
+    this.node = node;
+    this.connBuilder.nodes.filter(n => n.selected).forEach(n => this.select(n, false));
+    this.select(node, true);
+    e.stopPropagation();
+  }
+
+  select(n: Node, is: boolean) {
+    n.selected = is;
+    n.box.setAttribute('stroke', is ? 'green' : 'black');
+    n.box.setAttribute('stroke-width', is ? '2' : '1');
+    n.box.setAttribute('filter', is ? 'url(#f3)' : '');
+  }
+
   node_md(e: MouseEvent, node: Node) {
     if (e.button === 0 && !this.origin) {
       this.origin = { X: e.clientX, Y: e.clientY };

@@ -103,6 +103,7 @@ export default class Director {
     let builder = this.getBuilder(node);
     builder.add(node);
     builder.draggable(node);
+    builder.clickable(node);
     this.connBuilder.sourceAction(node);
     this.nodes.push(node);
     return node.id;

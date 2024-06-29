@@ -6,6 +6,7 @@ export abstract class Node {
   abstract box: SVGElement;
   pointer?: SVGPathElement;
   connectors: Connector[] = [];
+  selected = false;
   abstract center(): Point;
   abstract allSides(): Side[];
   abstract connSide(node2: Node): Side;
