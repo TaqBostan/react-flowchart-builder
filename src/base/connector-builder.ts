@@ -1,5 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side } from './types'
+import { Connector, Node, Point, Side, ConnectorData } from './types'
 
 export default class ConnectorBuilder {
   static editable: boolean;
@@ -31,9 +31,9 @@ export default class ConnectorBuilder {
     }
   }
 
-  connect(node: Node, label?: string, type: string = 'solid') {
+  connect(node: Node, connData?: ConnectorData) {
     if (this.sourceNode) {
-      let originNode = this.sourceNode;
+      let originNode = this.sourceNode, type = (connData?.type) ? connData.type : "solid";
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let sideOrigin = originNode.connSide(node);
@@ -43,7 +43,7 @@ export default class ConnectorBuilder {
       group.append(path);
       if (!self) group.append(arrow!);
       this.svg.append(group);
-      let connLabel = ConnHelper.addLabel(group, ConnectorBuilder.editable, label);
+      let connLabel = ConnHelper.addLabel(group, ConnectorBuilder.editable, connData?.text);
       let originConn: Connector = {
         id: ++this.maxId,
         group,
@@ -55,14 +55,17 @@ export default class ConnectorBuilder {
         side: sideOrigin,
         self,
         toDest: true,
-        type: type
+        type: type,
+        selected: false
       }
+      if (connData?.ratioS) originConn.horizon = { ratioH: connData.ratioS[0], ratioV: connData.ratioS[1] }
       originNode.connectors.push(originConn);
       if (ConnectorBuilder.editable) this.labelEvent(originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let side = node.connSide(originNode);
-        let conn = { ...originConn, nextNode: originNode, side, toDest: !originConn.toDest, point: undefined }
+        let conn = { ...originConn, nextNode: originNode, side, toDest: !originConn.toDest, point: undefined };
+        if (connData?.ratioD) conn.horizon = { ratioH: connData.ratioD[0], ratioV: connData.ratioD[1] }
         node.connectors.push(conn);
         node.arrangeSide(side);
         this.updateConn(node, side);
@@ -74,6 +77,7 @@ export default class ConnectorBuilder {
   labelEvent(node: Node, conn: Connector) {
     conn.label!.g.onmousedown = (event: MouseEvent) => this.label_md(event, node, conn);
     conn.label!.g.ondblclick = () => this.label_dc(node, conn);
+    conn.label!.g.onclick = () => this.label_c(conn);
   }
 
   label_dc(node: Node, conn: Connector) {
@@ -101,9 +105,44 @@ export default class ConnectorBuilder {
       this.labelEvent(node, conn);
     }
     input.onkeyup = (e: KeyboardEvent) => {
-      if(e.key === 'Enter') input.onblur?.(new FocusEvent('blur'));
+      if (e.key === 'Enter') input.onblur?.(new FocusEvent('blur'));
     }
   }
+
+  label_c(conn: Connector) {
+    this.unselect();
+    if (!conn.self) {
+      let _conn = this.getPairConn(conn);
+      this.svg.append(ConnHelper.createHorizonDisc(conn));
+      this.svg.append(ConnHelper.createHorizonDisc(_conn));
+    }
+    this.select(conn, true);
+  }
+
+  select(conn: Connector, is: boolean) {
+    conn.selected = is;
+    conn.path.setAttribute('stroke', is ? 'green' : conn.type ==='solid' ? 'black' : 'gray');
+    conn.path.setAttribute('stroke-width', is ? '2' : '1');
+    conn.path.setAttribute('filter', is ? 'url(#f3)' : '');
+    conn.arrow?.setAttribute('fill', is ? 'green' : conn.type ==='solid' ? 'black' : 'gray');
+  }
+
+  unselect() {
+    this.nodes
+      .reduce((conns: Connector[], node) => [...conns, ...node.connectors], [])
+      .filter(conn => conn.selected)
+      .forEach(conn => {
+        this.select(conn, false);
+        if (!conn.self) {
+          let _conn = this.getPairConn(conn);
+          _conn.horizon!.elem!.remove();
+          _conn.horizon!.elem = undefined;
+          conn.horizon!.elem!.remove();
+          conn.horizon!.elem = undefined;
+        }
+      });
+  }
+
 
   label_md(e: MouseEvent, node: Node, connector: Connector) {
     if (e.button === 0 && !this.origin) {
@@ -181,8 +220,8 @@ export default class ConnectorBuilder {
       else {
         node.setHorizon(connector, p1, p2);
         connector.nextNode.setHorizon(connector2, p2, p1);
-        let h1 = connector.horizon!, hPoint1 = h1.point;
-        let h2 = connector2.horizon!, hPoint2 = h2.point;
+        let h1 = connector.horizon!, hPoint1 = h1.point!;
+        let h2 = connector2.horizon!, hPoint2 = h2.point!;
         node.updatePoints(p1, h1, p2, h2);
         connector.nextNode.updatePoints(p2, h2, p1, h1);
         pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
@@ -202,5 +241,9 @@ export default class ConnectorBuilder {
       ConnHelper.setArrow(elem, type)
     else
       ConnHelper.setStroke(elem, type)
+  }
+
+  getPairConn(conn: Connector): Connector {
+    return conn.nextNode.connectors.find(c => c.id === conn.id)!;
   }
 }

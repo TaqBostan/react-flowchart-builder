@@ -3,25 +3,27 @@ import { Connector, Horizon, Node, Point, Side } from "../../types";
 
 export class RhomNode extends Node {
   box: SVGPolygonElement = document.createElementNS("http://www.w3.org/2000/svg", 'polygon') as SVGPolygonElement;
+  ratio = { h: 0.333, v: 0};
   constructor(public id: number, public left: number, public top: number, public text: string, public diameter: number = 0) {
     super(id, left, top, text, 'rhombus')
   }
 
   setHorizon(conn: Connector, origin: Point, dest: Point): void {
-    if (conn.horizon === undefined) conn.horizon = { point: { X: 0, Y: 0 }, ratioH: 1 / 3, ratioV: 0 };
+    if (conn.horizon === undefined) conn.horizon = { ratioH: this.ratio.h, ratioV: this.ratio.v };
+    if(conn.horizon.point === undefined) conn.horizon.point ={ X: 0, Y: 0 };
     let hx: number, hy: number, side = conn.side as RhomSide;
     if (side.vertical) {
       hy = (dest.Y - origin.Y) * conn.horizon.ratioH;
-      if(Math.abs(hy) < 30) hy = Math.sign(hy) * 30;
+      if (Math.abs(hy) < 30) hy = Math.sign(hy) * 30;
       hx = - hy * conn.horizon.ratioV;
     }
     else {
       hx = (dest.X - origin.X) * conn.horizon.ratioH;
-      if(Math.abs(hx) < 30) hx = Math.sign(hx) * 30;
+      if (Math.abs(hx) < 30) hx = Math.sign(hx) * 30;
       hy = hx * conn.horizon.ratioV;
     }
-    conn.horizon.point.X = origin.X + hx;
-    conn.horizon.point.Y = origin.Y + hy;
+    conn.horizon.point!.X = origin.X + hx;
+    conn.horizon.point!.Y = origin.Y + hy;
   }
 
   updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {

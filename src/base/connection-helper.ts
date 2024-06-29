@@ -1,4 +1,4 @@
-import { Point } from './types'
+import { Connector, Point } from './types'
 
 export default class ConnectionHelper {
   static connInfo(a: Point, b: Point, h1: Point, h2: Point) {
@@ -32,17 +32,17 @@ export default class ConnectionHelper {
     f.setAttribute("x", "1");
     f.setAttribute("y", "1");
     div.setAttribute("xmlns", 'http://www.w3.org/1999/xhtml');
-    if(text) input.value = text;
+    if (text) input.value = text;
     input.setAttribute("class", 'lbl-input');
     input.style.width = width + "px";
     div.append(input);
     f.append(div);
-    return {foreign: f, input};
+    return { foreign: f, input };
   }
 
   static setStroke(path: SVGPathElement, type: string) {
     if (type === 'solid') {
-      path.setAttribute("stroke", "green");
+      path.setAttribute("stroke", "black");
       path.removeAttribute("stroke-dasharray");
     }
     else if (type === 'dashed') {
@@ -81,7 +81,7 @@ export default class ConnectionHelper {
     else {
       elem.setAttribute('visibility', 'hidden');
       size = { X: 12, Y: 8 };
-  }
+    }
 
     box?.setAttribute('height', size.Y.toString());
     box?.setAttribute('width', size.X.toString());
@@ -98,7 +98,7 @@ export default class ConnectionHelper {
 
   static setArrow(path: SVGPathElement, type: string) {
     if (type === 'solid')
-      path.setAttribute('fill', 'green');
+      path.setAttribute('fill', 'black');
     else if (type === 'dashed')
       path.setAttribute('fill', 'gray');
   }
@@ -108,5 +108,17 @@ export default class ConnectionHelper {
     p.setAttribute("class", "connector");
     p.setAttribute("stroke", "green");
     return p;
+  }
+
+  static createHorizonDisc(conn: Connector): SVGRectElement {
+    let disc: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect'), point = conn.horizon!.point!;
+    disc.setAttribute('height', "7");
+    disc.setAttribute('width', "7");
+    disc.setAttribute('fill', 'green');
+    disc.setAttribute("x", (point.X - 3.5).toString());
+    disc.setAttribute("y", (point.Y - 3.5).toString())
+    disc.classList.add('grabbable');
+    conn.horizon!.elem = disc;   
+    return disc;
   }
 }

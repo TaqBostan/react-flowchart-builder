@@ -70,7 +70,7 @@ export default class Director {
       let origin = this.nodes.find(n => n.id === connector.from), destination = this.nodes.find(n => n.id === connector.to);
       if (!origin || !destination) throw Error('Node from/to not found!');
       this.connBuilder.sourceNode = origin;
-      this.connBuilder.connect(destination, connector.text, connector.type);
+      this.connBuilder.connect(destination, connector);
     });
   }
 
@@ -81,10 +81,20 @@ export default class Director {
         (conns: ConnectorData[], node) => [...conns,
         ...node.connectors
           .filter(n => n.toDest)
-          .map(conn => ({ id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type }))],
-        []
-      )
-    }
+          .map(conn => {
+            let c: ConnectorData = { id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type };
+            if (!conn.self) {
+              if (node.ratio.h !== conn.horizon?.ratioH || node.ratio.v !== conn.horizon.ratioV)
+                c.ratioS = [conn.horizon!.ratioH, conn.horizon!.ratioV];
+              let _conn = this.connBuilder.getPairConn(conn);
+              if (conn.nextNode.ratio.h !== _conn.horizon?.ratioH || conn.nextNode.ratio.v !== _conn.horizon.ratioV)
+                c.ratioD = [_conn.horizon!.ratioH, _conn.horizon!.ratioV];
+            }
+            return c;
+          }
+
+          )], [])
+    };
   }
 
   changeConnType(id: number, type: string) {

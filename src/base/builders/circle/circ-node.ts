@@ -4,12 +4,13 @@ import Util from "../../util";
 
 export class CircleNode extends Node {
   box: SVGCircleElement = document.createElementNS("http://www.w3.org/2000/svg", 'circle') as SVGCircleElement;
+  ratio = { h: 0.333, v: 0 };
   constructor(public id: number, public left: number, public top: number, public text: string, public radius: number = 0) {
     super(id, left, top, text, 'circle')
   }
 
   setHorizon(conn: Connector, origin: Point, dest: Point): void {
-    if (conn.horizon !== undefined) return;
+    if (conn.horizon?.point !== undefined) return;
     let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)), center = this.center(),
       vector = [origin.X - center.X, origin.Y - center.Y];
     let point = { X: origin.X + vector[0] * distance / this.radius / 3, Y: origin.Y + vector[1] * distance / this.radius / 3 };
@@ -17,9 +18,9 @@ export class CircleNode extends Node {
   }
 
   updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {
-    let center = this.center(), hPoint = hrz.point, hPoint2 = hrz2.point, phi: number, sign = p2.X < p.X ? 1 : -1;
+    let center = this.center(), hPoint = hrz.point!, hPoint2 = hrz2.point!, phi: number, sign = p2.X < p.X ? 1 : -1;
     if (hrz.ratioH === 0) {
-      hrz.ratioH = 1 / 3;
+      hrz.ratioH = this.ratio.h;
       let v1 = [p2.X - center.X, p2.Y - center.Y], v2 = [hPoint2.X - center.X, hPoint2.Y - center.Y], v1v2 = v1[0] * v2[1] - v1[1] * v2[0];
       let l1 = Util.len(v1), l2 = Util.len(v2);
       phi = l1 > 0 && l2 > 0 ? sign * Math.asin(v1v2 / l1 / l2) : 0;
