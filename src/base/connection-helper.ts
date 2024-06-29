@@ -33,7 +33,8 @@ export default class ConnectionHelper {
     f.setAttribute("y", "1");
     div.setAttribute("xmlns", 'http://www.w3.org/1999/xhtml');
     if(text) input.value = text;
-    input.setAttribute("style", 'border:0;font-size:14px');
+    input.setAttribute("class", 'lbl-input');
+    input.style.width = width + "px";
     div.append(input);
     f.append(div);
     return {foreign: f, input};
@@ -53,32 +54,34 @@ export default class ConnectionHelper {
   static addLabel(container: SVGGElement, editable: boolean, text?: string) {
     if (!editable && !text) return undefined;
     let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-    let elem: SVGTextElement | undefined, size: Point;
+    let elem = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement, size: Point;
 
     let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
     box.setAttribute('rx', '3');
     box.setAttribute('ry', '3');
-    box.classList.add('label-box');
+    box.classList.add('lbl-box');
     if (editable) box.classList.add('grabbable');
 
     g.append(box);
     container.append(g);
 
+    elem.setAttribute('text-anchor', 'middle');
+    elem.classList.add('lbl-text');
+    g.append(elem);
+
     if (text) {
-      elem = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement;
       elem.innerHTML = text;
-      elem.setAttribute('text-anchor', 'middle');
-      elem.classList.add('label-text');
       if (editable) elem.classList.add('grabbable');
-      g.append(elem);
       let bbox = elem.getBBox();
       let width = Math.max(bbox.width, 14);
       size = { X: width + 6, Y: bbox.height + 4 };
       elem.setAttribute('x', (width / 2 + 3).toString());
       elem.setAttribute('y', (bbox.height - 1).toString());
     }
-    else if (editable) size = { X: 12, Y: 8 };
-    else size = { X: 0, Y: 0 };
+    else {
+      elem.setAttribute('visibility', 'hidden');
+      size = { X: 12, Y: 8 };
+  }
 
     box?.setAttribute('height', size.Y.toString());
     box?.setAttribute('width', size.X.toString());

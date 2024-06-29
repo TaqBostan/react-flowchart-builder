@@ -1,12 +1,18 @@
-.label-box {
+.lbl-box {
   stroke:rgb(66, 111, 122);
   stroke-width:0.5;
   fill: #eee99c80;
 }
 
-.label-text {
+.lbl-text {
   font-size: 14px;
   user-select: none;
+}
+
+.lbl-input {
+  border:0;
+  font-size:14px;
+  font-family: inherit;
 }
 
 .node-txt {

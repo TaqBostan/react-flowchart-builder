@@ -44,7 +44,7 @@ export type Connector = {
   id: number,
   group: SVGGElement,
   path: SVGPathElement,
-  label: { g: SVGGElement, box: SVGRectElement, size: Point, text?: string, elem?: SVGTextElement } | undefined,
+  label: { g: SVGGElement, box: SVGRectElement, size: Point, text?: string, elem: SVGTextElement } | undefined,
   arrow?: SVGPathElement,
   nextNode: Node,
   point?: Point,

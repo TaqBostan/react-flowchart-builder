@@ -77,15 +77,17 @@ export default class ConnectorBuilder {
   }
 
   label_dc(node: Node, conn: Connector) {
-    let lbl = conn.label!, width = (lbl.elem?.getBBox().width || 30) + 6, height = 17;
-    lbl.elem?.remove();
+    conn.label!.g.onmousedown = conn.label!.g.ondblclick = null;
+    let lbl = conn.label!, width = lbl.elem.getBBox().width + 14, height = 17;
+    lbl.elem.setAttribute('visibility', 'hidden');
     lbl.box.setAttribute('width', (width + 2).toString());
     lbl.box.setAttribute('height', (height + 2).toString());
     let { foreign, input } = ConnHelper.createLabelInput(width, height, lbl.text);
     lbl.g.append(foreign);
     input.focus();
     input.oninput = () => {
-      input.style.width = input.value.length + "ch";
+      lbl.elem.textContent = input.value;
+      input.style.width = (lbl.elem.getBBox().width + 14) + "px";
       foreign.setAttribute("width", `${input.offsetWidth}`);
       lbl.box.setAttribute('width', `${input.offsetWidth + 2}`);
     }
