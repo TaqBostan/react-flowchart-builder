@@ -57,7 +57,7 @@ const Flowchart = (props: FlowchartProps) => {
     <div style={wrapperCss} className='wp-svg'>
       <svg ref={wrapper} style={{ top: 0, left: 0 }} className='the-svg'>
         <defs>
-          <filter id="f3" width="2" height="2">
+          <filter id="flt" width="2" height="2">
             <feOffset in="SourceAlpha" dx="1.5" dy="1.5" />
             <feGaussianBlur stdDeviation="2" />
             <feBlend in="SourceGraphic" in2="blurOut" />
