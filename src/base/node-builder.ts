@@ -6,10 +6,12 @@ export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
   origin?: Point;
   node?: Node;
+  nodes: Node[];
   abstract ofType<T extends Node>(node: T): boolean;
   abstract setSize(n: Node): void;
 
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder, public sd: StaticData) {
+    this.nodes = this.connBuilder.nodes
   }
 
   add(n: Node): Node {
@@ -53,7 +55,7 @@ export default abstract class NodeBuilder<N extends Node> {
 
   node_c(e: MouseEvent, node: Node) {
     this.node = node;
-    this.connBuilder.nodes.filter(n => n.selected).forEach(n => this.select(n, false));
+    this.nodes.filter(n => n.selected).forEach(n => this.select(n, false));
     this.select(node, true);
     e.stopPropagation();
   }
@@ -62,7 +64,7 @@ export default abstract class NodeBuilder<N extends Node> {
     n.selected = is;
     n.box.setAttribute('stroke', is ? 'green' : 'black');
     n.box.setAttribute('stroke-width', is ? '2' : '1');
-    n.box.setAttribute('filter', is ? 'url(#f3)' : '');
+    n.box.setAttribute('filter', is ? 'url(#flt)' : '');
   }
 
   node_md(e: MouseEvent, node: Node) {

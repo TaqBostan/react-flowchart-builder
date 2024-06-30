@@ -126,8 +126,8 @@ export default class ConnectorBuilder {
     conn.selected = is;
     conn.path.setAttribute('stroke', is ? 'green' : conn.type === 'solid' ? 'black' : 'gray');
     conn.path.setAttribute('stroke-width', is ? '2' : '1');
-    conn.path.setAttribute('filter', is ? 'url(#f3)' : '');
-    conn.arrow?.setAttribute('fill', is ? 'green' : conn.type === 'solid' ? 'black' : 'gray');
+    conn.path.setAttribute('filter', is ? 'url(#flt)' : '');
+    conn.arrow?.setAttribute('fill', is ? 'green' : conn.type ==='solid' ? 'black' : 'gray');
   }
 
   unselect() {
@@ -214,7 +214,7 @@ export default class ConnectorBuilder {
 
   updateConn(node: Node, side: Side) {
     node.connectors.filter(c => c.side.equal(side)).forEach(connector => {
-      let p1 = connector.point!, connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!, p2 = connector2.point!;
+      let p1 = connector.point!, connector2 = this.getPairConn(connector), p2 = connector2.point!;
       let pathD: string, labelPoint: Point;
       if (connector.self) {
         pathD = ConnHelper.roundPath(p1);
