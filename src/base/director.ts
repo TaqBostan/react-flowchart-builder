@@ -103,8 +103,8 @@ export default class Director {
         .filter(conn => conn.id === id)], [])
       .forEach(connector => {
         connector.type = type;
-        if (connector.arrow) this.connBuilder.setConnType(connector.arrow, type, true);
-        this.connBuilder.setConnType(connector.path, type, false);
+        if (connector.arrow) this.connBuilder.setConnType(connector, type);
+        this.connBuilder.setConnType(connector, type);
       });
   }
 

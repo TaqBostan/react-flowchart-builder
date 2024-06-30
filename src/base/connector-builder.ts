@@ -112,19 +112,22 @@ export default class ConnectorBuilder {
   label_c(conn: Connector) {
     this.unselect();
     if (!conn.self) {
-      let _conn = this.getPairConn(conn);
-      this.svg.append(ConnHelper.createHorizonDisc(conn));
-      this.svg.append(ConnHelper.createHorizonDisc(_conn));
+      let _conn = this.getPairConn(conn), disc = ConnHelper.createHorizonDisc(conn.horizon!.point!);
+      conn.horizon!.elem = disc;
+      this.svg.append(disc);
+      disc = ConnHelper.createHorizonDisc(_conn.horizon!.point!);
+      _conn.horizon!.elem = disc;
+      this.svg.append(disc);
     }
     this.select(conn, true);
   }
 
   select(conn: Connector, is: boolean) {
     conn.selected = is;
-    conn.path.setAttribute('stroke', is ? 'green' : conn.type ==='solid' ? 'black' : 'gray');
+    conn.path.setAttribute('stroke', is ? 'green' : conn.type === 'solid' ? 'black' : 'gray');
     conn.path.setAttribute('stroke-width', is ? '2' : '1');
     conn.path.setAttribute('filter', is ? 'url(#f3)' : '');
-    conn.arrow?.setAttribute('fill', is ? 'green' : conn.type ==='solid' ? 'black' : 'gray');
+    conn.arrow?.setAttribute('fill', is ? 'green' : conn.type === 'solid' ? 'black' : 'gray');
   }
 
   unselect() {
@@ -236,11 +239,9 @@ export default class ConnectorBuilder {
     });
   }
 
-  setConnType(elem: SVGPathElement, type: string, isArrow: boolean) {
-    if (isArrow)
-      ConnHelper.setArrow(elem, type)
-    else
-      ConnHelper.setStroke(elem, type)
+  setConnType(conn: Connector, type: string) {
+    ConnHelper.setArrow(conn.arrow!, type)
+    ConnHelper.setPath(conn.path, type)
   }
 
   getPairConn(conn: Connector): Connector {

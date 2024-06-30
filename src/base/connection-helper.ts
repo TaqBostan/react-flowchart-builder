@@ -20,7 +20,7 @@ export default class ConnectionHelper {
   static createConnector(type: string): SVGPathElement {
     let c = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
     c.setAttribute("class", "connector");
-    this.setStroke(c, type);
+    this.setPath(c, type);
     return c;
   }
   static createLabelInput(width: number, height: number, text: string | undefined) {
@@ -40,7 +40,7 @@ export default class ConnectionHelper {
     return { foreign: f, input };
   }
 
-  static setStroke(path: SVGPathElement, type: string) {
+  static setPath(path: SVGPathElement, type: string) {
     if (type === 'solid') {
       path.setAttribute("stroke", "black");
       path.removeAttribute("stroke-dasharray");
@@ -110,15 +110,14 @@ export default class ConnectionHelper {
     return p;
   }
 
-  static createHorizonDisc(conn: Connector): SVGRectElement {
-    let disc: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect'), point = conn.horizon!.point!;
+  static createHorizonDisc(point: Point): SVGRectElement {
+    let disc: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
     disc.setAttribute('height', "7");
     disc.setAttribute('width', "7");
     disc.setAttribute('fill', 'green');
     disc.setAttribute("x", (point.X - 3.5).toString());
     disc.setAttribute("y", (point.Y - 3.5).toString())
     disc.classList.add('grabbable');
-    conn.horizon!.elem = disc;   
     return disc;
   }
 }
