@@ -3,7 +3,7 @@ export abstract class Node {
   group: SVGGElement = document.createElementNS(svgns, 'g') as SVGGElement;
   label: SVGTextElement = document.createElementNS(svgns, 'text') as SVGTextElement;
   source: SVGRectElement = document.createElementNS(svgns, 'rect') as SVGRectElement;
-  abstract box: SVGElement; 
+  abstract box: SVGElement;
   abstract ratio: { h: number, v: number };
   pointer?: SVGPathElement;
   connectors: Connector[] = [];
@@ -13,7 +13,7 @@ export abstract class Node {
   abstract connSide(node2: Node): Side;
   abstract arrangeSide(side: Side): void;
   abstract setHorizon(conn: Connector, origin: Point, dest: Point): void;
-  abstract updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon): void; 
+  abstract updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon): void;
   constructor(public id: number, public left: number, public top: number, public text: string, public shape: string) {
   }
 
@@ -56,10 +56,11 @@ export type Connector = {
   self: boolean,
   toDest: boolean,
   type: string,
-  selected: boolean
+  selected: boolean,
+  pairConn?: Connector
 }
 
-export type ConnectorData = { id?: number, from: number, to: number, text?: string, type?:string, ratioS?: number[], ratioD?: number[]}
+export type ConnectorData = { id?: number, from: number, to: number, text?: string, type?: string, ratioS?: number[], ratioD?: number[] }
 
 export type Point = { X: number, Y: number }
 

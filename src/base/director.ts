@@ -86,7 +86,7 @@ export default class Director {
             if (!conn.self) {
               if (node.ratio.h !== conn.horizon?.ratioH || node.ratio.v !== conn.horizon.ratioV)
                 c.ratioS = [conn.horizon!.ratioH, conn.horizon!.ratioV];
-              let _conn = this.connBuilder.getPairConn(conn);
+              let _conn = conn.pairConn!;
               if (conn.nextNode.ratio.h !== _conn.horizon?.ratioH || conn.nextNode.ratio.v !== _conn.horizon.ratioV)
                 c.ratioD = [_conn.horizon!.ratioH, _conn.horizon!.ratioV];
             }
