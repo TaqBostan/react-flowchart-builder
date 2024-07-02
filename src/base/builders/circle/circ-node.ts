@@ -1,5 +1,5 @@
 
-import { Connector, Horizon, Node, Point, Side } from "../../types";
+import { Horizon, Node, Point, Side } from "../../types";
 import Util from "../../util";
 
 export class CircleNode extends Node {
@@ -7,14 +7,6 @@ export class CircleNode extends Node {
   ratio = { h: 0.333, v: 0 };
   constructor(public id: number, public left: number, public top: number, public text: string, public radius: number = 0) {
     super(id, left, top, text, 'circle')
-  }
-
-  setHorizon(conn: Connector, origin: Point, dest: Point): void {
-    if (conn.horizon?.point !== undefined) return;
-    let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)), center = this.center(),
-      vector = [origin.X - center.X, origin.Y - center.Y];
-    let point = { X: origin.X + vector[0] * distance / this.radius / 3, Y: origin.Y + vector[1] * distance / this.radius / 3 };
-    conn.horizon = { point, ratioH: 0, ratioV: 0 };
   }
 
   updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {

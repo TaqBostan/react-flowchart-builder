@@ -1,6 +1,6 @@
 
 import ConnectorBuilder from './connector-builder';
-import { Node, Point, StaticData } from './types'
+import { Connector, Node, Point, StaticData } from './types'
 
 export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
@@ -9,9 +9,11 @@ export default abstract class NodeBuilder<N extends Node> {
   nodes: Node[];
   abstract ofType<T extends Node>(node: T): boolean;
   abstract setSize(n: Node): void;
-
+  abstract setPrototype(): void
+  abstract setHorizon(this: Node, conn: Connector, origin: Point, dest: Point): void
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder, public sd: StaticData) {
-    this.nodes = this.connBuilder.nodes
+    this.nodes = this.connBuilder.nodes;
+    this.setPrototype();
   }
 
   add(n: Node): Node {
