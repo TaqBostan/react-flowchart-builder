@@ -78,7 +78,7 @@ export default class ConnectorBuilder {
   labelEvent(node: Node, conn: Connector) {
     conn.label!.g.onmousedown = (event: MouseEvent) => this.label_md(event, node, conn);
     conn.label!.g.ondblclick = () => this.label_dc(node, conn);
-    conn.label!.g.onclick = () => this.label_c(conn);
+    conn.label!.g.onclick = (event: MouseEvent) => this.label_c(event, conn);
   }
 
   label_dc(node: Node, conn: Connector) {
@@ -110,13 +110,14 @@ export default class ConnectorBuilder {
     }
   }
 
-  label_c(conn: Connector) {
+  label_c(e: MouseEvent, conn: Connector) {
     this.unselect();
     if (!conn.self) {
       this.createHorizonDisc(conn);
       this.createHorizonDisc(conn.pairConn!);
     }
     this.select(conn, true);
+    e.stopPropagation();
   }
 
   createHorizonDisc(conn: Connector) {
@@ -178,15 +179,9 @@ export default class ConnectorBuilder {
   label_mu(e: MouseEvent) {
     if (e.button === 0 && this.origin && this.connector) {
       if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
-        let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector?.id)!;
+        let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector!.id)!;
         this.sourceNode!.connectors.splice(index1, 1);
-        if (!this.connector.self) {
-          let index2 = this.connector.nextNode.connectors.findIndex(c => c.id === this.connector?.id)!;
-          this.connector.nextNode.connectors.splice(index2, 1);
-        }
-        this.connector.group.remove();
-        this.connector.horizon?.elem?.remove();
-        this.connector.pairConn?.horizon?.elem?.remove();
+        this.delete(this.connector!);
       }
       else this.connector.group.removeAttribute('transform');
       this.svg.onmousemove = null;
@@ -195,6 +190,16 @@ export default class ConnectorBuilder {
       this.sourceNode = undefined;
       this.connector = undefined;
     }
+  }
+  // removes a conn and only removes it from conn.nextNode.connectors array
+  delete(conn: Connector) {
+    if (!conn.self) {
+      let index2 = conn.nextNode.connectors.findIndex(c => c.id === conn.id)!;
+      conn.nextNode.connectors.splice(index2, 1);
+    }
+    conn.group.remove();
+    conn.horizon?.elem?.remove();
+    conn.pairConn?.horizon?.elem?.remove();
   }
 
   source_mu(e: MouseEvent) {

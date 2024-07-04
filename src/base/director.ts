@@ -17,8 +17,40 @@ export default class Director {
     let parent = svg.parentElement!;
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
     this.builders = [new RectBuilder(svg, this.connBuilder, Director.sd), new CircleBuilder(svg, this.connBuilder, Director.sd), new RhomBuilder(svg, this.connBuilder, Director.sd)];
+    window.onkeyup = (event: KeyboardEvent) => this.win_ku(event);
     parent.onmousedown = (event: MouseEvent) => this.drag_md(event);
+    parent.onclick = () => this.parent_c();
     parent.addEventListener('wheel', (e: WheelEvent) => this.mousewheel(e))
+  }
+
+  getBuilder<T extends Node>(node: T): NodeBuilder<T> {
+    return this.builders.find(b => b.ofType(node))! as NodeBuilder<T>;
+  }
+
+  parent_c() {
+    this.nodes.filter(n => n.selected).forEach(n => this.getBuilder(n).select(n, false));
+    this.connBuilder.unselect();
+  }
+
+  win_ku(e: KeyboardEvent) {
+    if (e.key === 'Delete') {
+      this.nodes.forEach((node, i, arr) => {
+        if (node.selected) {
+          node.connectors.forEach(conn => this.connBuilder.delete(conn));
+          arr.splice(i, 1);
+          this.getBuilder(node).delete(node);
+        }
+        else {
+          node.connectors
+            .forEach((conn, i, arr) => {
+              if (conn.selected && conn.toDest) {
+                this.connBuilder.delete(conn);
+                arr.splice(i, 1);
+              }
+            });
+        }
+      });
+    }
   }
 
   mousewheel(e: WheelEvent) {
@@ -55,10 +87,6 @@ export default class Director {
       this.svg.parentElement!.onmouseup = null;
       this.origin = undefined;
     }
-  }
-
-  getBuilder<T extends Node>(node: T): NodeBuilder<T> {
-    return this.builders.find(b => b.ofType(node))! as NodeBuilder<T>;
   }
 
   addNodes(nodes: Node[]) {
@@ -98,9 +126,8 @@ export default class Director {
   }
 
   changeConnType(id: number, type: string) {
-    this.nodes
-      .reduce((conns: Connector[], node) => [...conns, ...node.connectors
-        .filter(conn => conn.id === id)], [])
+    this.getConns()
+      .filter(conn => conn.id === id)
       .forEach(connector => {
         connector.type = type;
         if (connector.arrow) this.connBuilder.setConnType(connector, type);
@@ -117,6 +144,10 @@ export default class Director {
     this.connBuilder.sourceAction(node);
     this.nodes.push(node);
     return node.id;
+  }
+
+  getConns() {
+    return this.nodes.reduce((conns: Connector[], node) => [...conns, ...node.connectors], []);
   }
 
   static init(container: SVGSVGElement, editable: boolean = false) {

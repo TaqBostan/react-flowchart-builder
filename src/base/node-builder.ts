@@ -47,6 +47,10 @@ export default abstract class NodeBuilder<N extends Node> {
     return n;
   }
 
+  delete(n: Node) {
+    n.group.remove();
+  }
+
   draggable(node: Node) {
     node.group.onmousedown = (event: MouseEvent) => this.node_md(event, node);
   }
