@@ -7,7 +7,7 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
   ofType<T>(node: T): boolean {
     return node instanceof RhomNode;
   }
-  setPrototype(): void {
+  nodeProto(): void {
     let builder = this
     RhomNode.prototype.setHorizon = function (...params) { builder.setHorizon.apply(this, params) }
   }

@@ -1,6 +1,6 @@
 
 import ConnectorBuilder from './connector-builder';
-import { Connector, Node, Point, StaticData } from './types'
+import { Node, Point, StaticData } from './types'
 
 export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
@@ -9,11 +9,11 @@ export default abstract class NodeBuilder<N extends Node> {
   nodes: Node[];
   abstract ofType<T extends Node>(node: T): boolean;
   abstract setSize(n: Node): void;
-  abstract setPrototype(): void
-  abstract setHorizon(this: Node, conn: Connector, origin: Point, dest: Point): void
+  abstract nodeProto(): void;
+
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder, public sd: StaticData) {
     this.nodes = this.connBuilder.nodes;
-    this.setPrototype();
+    this.nodeProto();
   }
 
   add(n: Node): Node {
@@ -86,8 +86,7 @@ export default abstract class NodeBuilder<N extends Node> {
         connector.side = this.node!.connSide(connector.nextNode);
         if (!connector.self) {
           let side2 = connector.nextNode.connSide(this.node!);
-          let connector2 = connector.nextNode.connectors.find(c => c.id === connector.id)!;
-          connector2.side = side2;
+          connector.pairConn!.side = side2;
           connector.nextNode.arrangeSide(side2);
           this.connBuilder.updateConn(connector.nextNode, side2);
         }

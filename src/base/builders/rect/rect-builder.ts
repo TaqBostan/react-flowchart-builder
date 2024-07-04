@@ -7,7 +7,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   ofType<T>(node: T): boolean {
     return node instanceof RectNode;
   }
-  setPrototype(): void {
+  nodeProto(): void {
     let builder = this
     RectNode.prototype.setHorizon = function (...params) { builder.setHorizon.apply(this, params) }
   }

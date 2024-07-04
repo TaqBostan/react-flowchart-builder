@@ -1,8 +1,8 @@
 
-import { Connector, Horizon, Node, Point, Side } from "../../types";
+import { Horizon, Node, ns, Point, Side } from "../../types";
 
 export class RhomNode extends Node {
-  box: SVGPolygonElement = document.createElementNS("http://www.w3.org/2000/svg", 'polygon') as SVGPolygonElement;
+  box: SVGPolygonElement = document.createElementNS(ns, 'polygon') as SVGPolygonElement;
   ratio = { h: 0.333, v: 0};
   constructor(public id: number, public left: number, public top: number, public text: string, public diameter: number = 0) {
     super(id, left, top, text, 'rhombus')

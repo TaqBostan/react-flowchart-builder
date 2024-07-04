@@ -6,7 +6,7 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
   ofType<T>(node: T): boolean {
     return node instanceof CircleNode;
   }
-  setPrototype(): void {
+  nodeProto(): void {
     let builder = this
     CircleNode.prototype.setHorizon = function (...params) { builder.setHorizon.apply(this, params) }
   }

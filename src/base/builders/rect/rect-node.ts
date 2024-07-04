@@ -1,8 +1,8 @@
 
-import { Horizon, Node, Point, Side } from "../../types";
+import { Horizon, Node, ns, Point, Side } from "../../types";
 
 export class RectNode extends Node {
-  box: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect') as SVGRectElement;
+  box: SVGRectElement = document.createElementNS(ns, 'rect') as SVGRectElement;
   ratio = { h: 0.333, v: 0.167};
   constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 30) {
     super(id, left, top, text, 'rectangle')

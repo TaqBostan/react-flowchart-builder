@@ -1,4 +1,4 @@
-import { Connector, Point } from './types'
+import { ns, Point } from './types'
 
 export default class ConnectionHelper {
   static connInfo(a: Point, b: Point, h1: Point, h2: Point) {
@@ -18,20 +18,20 @@ export default class ConnectionHelper {
   }
 
   static createConnector(type: string): SVGPathElement {
-    let c = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
+    let c = document.createElementNS(ns, 'path') as SVGPathElement;
     c.setAttribute("class", "connector");
     this.setPath(c, type);
     return c;
   }
   static createLabelInput(width: number, height: number, text: string | undefined) {
-    let f = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject') as SVGForeignObjectElement;
+    let f = document.createElementNS(ns, 'foreignObject') as SVGForeignObjectElement;
     let div = document.createElement('div');
     let input = document.createElement('input');
     f.setAttribute("width", `${width}`);
     f.setAttribute("height", `${height}`);
     f.setAttribute("x", "1");
     f.setAttribute("y", "1");
-    div.setAttribute("xmlns", 'http://www.w3.org/1999/xhtml');
+    div.setAttribute("xmlns", ns);
     if (text) input.value = text;
     input.setAttribute("class", 'lbl-input');
     input.style.width = width + "px";
@@ -53,10 +53,10 @@ export default class ConnectionHelper {
 
   static addLabel(container: SVGGElement, editable: boolean, text?: string) {
     if (!editable && !text) return undefined;
-    let g = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
-    let elem = document.createElementNS("http://www.w3.org/2000/svg", 'text') as SVGTextElement, size: Point;
+    let g = document.createElementNS(ns, 'g') as SVGGElement;
+    let elem = document.createElementNS(ns, 'text') as SVGTextElement, size: Point;
 
-    let box = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    let box = document.createElementNS(ns, 'rect');
     box.setAttribute('rx', '3');
     box.setAttribute('ry', '3');
     box.classList.add('lbl-box');
@@ -90,7 +90,7 @@ export default class ConnectionHelper {
   }
 
   static createArrow(type: string): SVGPathElement {
-    let a = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
+    let a = document.createElementNS(ns, 'path') as SVGPathElement;
     this.setArrow(a, type);
     a.setAttribute('d', 'M0,0l-9,5v-10l9,5');
     return a;
@@ -104,14 +104,14 @@ export default class ConnectionHelper {
   }
 
   static createPointer(): SVGPathElement {
-    let p = document.createElementNS("http://www.w3.org/2000/svg", 'path') as SVGPathElement;
+    let p = document.createElementNS(ns, 'path') as SVGPathElement;
     p.setAttribute("class", "connector");
     p.setAttribute("stroke", "green");
     return p;
   }
 
   static createHorizonDisc(point: Point): SVGRectElement {
-    let disc: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    let disc: SVGRectElement = document.createElementNS(ns, 'rect');
     disc.setAttribute('height', "7");
     disc.setAttribute('width', "7");
     disc.setAttribute('fill', 'green');

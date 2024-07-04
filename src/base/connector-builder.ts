@@ -1,5 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side, ConnectorData } from './types'
+import { Connector, Node, Point, Side, ConnectorData, ns } from './types'
 
 export default class ConnectorBuilder {
   static editable: boolean;
@@ -37,7 +37,7 @@ export default class ConnectorBuilder {
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let sideOrigin = originNode.connSide(node);
-      let group = document.createElementNS("http://www.w3.org/2000/svg", 'g') as SVGGElement;
+      let group = document.createElementNS(ns, 'g') as SVGGElement;
       let path = ConnHelper.createConnector(type);
       let arrow = !self ? ConnHelper.createArrow(type) : undefined;
       group.append(path);

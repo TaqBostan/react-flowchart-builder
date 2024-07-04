@@ -1,8 +1,8 @@
-let svgns = "http://www.w3.org/2000/svg";
+export const ns = "http://www.w3.org/2000/svg";
 export abstract class Node {
-  group: SVGGElement = document.createElementNS(svgns, 'g') as SVGGElement;
-  label: SVGTextElement = document.createElementNS(svgns, 'text') as SVGTextElement;
-  source: SVGRectElement = document.createElementNS(svgns, 'rect') as SVGRectElement;
+  group: SVGGElement = document.createElementNS(ns, 'g') as SVGGElement;
+  label: SVGTextElement = document.createElementNS(ns, 'text') as SVGTextElement;
+  source: SVGRectElement = document.createElementNS(ns, 'rect') as SVGRectElement;
   abstract box: SVGElement;
   abstract ratio: { h: number, v: number };
   pointer?: SVGPathElement;
