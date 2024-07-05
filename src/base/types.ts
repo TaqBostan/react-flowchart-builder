@@ -10,9 +10,7 @@ export abstract class Node {
   selected = false;
   abstract center(): Point;
   abstract allSides(): Side[];
-  abstract connSide(node2: Node): Side;
-  abstract arrangeSide(side: Side): void;
-  abstract updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon): void;
+
   constructor(public id: number, public left: number, public top: number, public text: string, public shape: string) {
   }
 
@@ -21,6 +19,12 @@ export abstract class Node {
   }
 
   setHorizon(conn: Connector, origin: Point, dest: Point) { }
+
+  updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) { }
+
+  arrangeSide(side: Side) { }
+
+  connSide(node2: Node): Side { throw Error(); }
 
   grouping() {
     this.group.append(this.box);
