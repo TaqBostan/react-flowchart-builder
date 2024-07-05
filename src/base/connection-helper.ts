@@ -5,6 +5,10 @@ export default class ConnectionHelper {
     return `M${a.X},${a.Y}C${h1.X},${h1.Y},${h2.X},${h2.Y},${b.X},${b.Y}`;
   }
 
+  static labelPos(a: Point, b: Point, h1: Point, h2: Point) {
+    return { X: (a.X + 3 * h1.X + 3 * h2.X + b.X) / 8, Y: (a.Y + 3 * h1.Y + 3 * h2.Y + b.Y) / 8 }
+  }
+  
   static pointerInfo(a: Point, b: Point) {
     let d = [(b.X - a.X) / 2.5, (b.Y - a.Y) / 2.5], sign = d[0] > 0 ? 1 : -1, v = [sign * d[1] / 5, -sign * d[0] / 5];
     let p1 = [a.X + d[0] + v[0], a.Y + d[1] + v[1]];

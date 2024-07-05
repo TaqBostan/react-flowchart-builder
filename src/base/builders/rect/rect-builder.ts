@@ -8,12 +8,13 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     return node instanceof RectNode;
   }
   nodeProto(): void {
-    let builder = this
-    RectNode.prototype.setHorizon = function (...params) { builder.setHorizon.apply(this, params) }
-    RectNode.prototype.updatePoints = function (...params) { builder.updatePoints.apply(this, params) }
-    RectNode.prototype.arrangeSide = function (...params) { builder.arrangeSide.apply(this, params) }
-    RectNode.prototype.connSide = function (...params) { return builder.connSide.apply(this, params) }
-
+    let builder = this;
+    RectNode.prototype.setHorizon = function (...params) { builder.setHorizon.apply(this, params) };
+    RectNode.prototype.updatePoints = function (...params) { builder.updatePoints.apply(this, params) };
+    RectNode.prototype.arrangeSide = function (...params) { builder.arrangeSide.apply(this, params) };
+    RectNode.prototype.connSide = function (...params) { return builder.connSide.apply(this, params) };
+    RectNode.prototype.setPoint = function (...params) { return builder.setPoint.apply(this, params) };
+    RectNode.prototype.setRatio = function (...params) { return builder.setRatio.apply(this, params) };
   }
 
   setHorizon = function (this: RectNode, conn: Connector, origin: Point, dest: Point) {
@@ -55,6 +56,14 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     let vertical = Math.abs(c2.Y - c1.Y) * w1 > Math.abs(c2.X - c1.X) * h1;
     let firstSide = vertical ? (c2.Y < c1.Y) : (c2.X < c1.X);
     return new RectSide(vertical, firstSide);
+  }
+
+  setPoint = function (this: RectNode, hrz: Horizon): Point {
+    return { X: 0, Y: 0 };
+  }
+
+  setRatio = function (this: RectNode, conn: Connector): [number, number] {
+    return [0, 0];
   }
 
   setSize(n: RectNode): void {

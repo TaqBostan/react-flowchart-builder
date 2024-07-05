@@ -1,6 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side, ConnectorData, ns } from './types'
-
+import { Connector, Node, Point, Side, ConnectorData, ns } from './types';
 export default class ConnectorBuilder {
   static editable: boolean;
   maxId: number = 0;
@@ -78,7 +77,7 @@ export default class ConnectorBuilder {
   labelEvent(node: Node, conn: Connector) {
     conn.label!.g.onmousedown = (event: MouseEvent) => this.label_md(event, node, conn);
     conn.label!.g.ondblclick = () => this.label_dc(node, conn);
-    conn.label!.g.onclick = (event: MouseEvent) => this.label_c(event, conn);
+    conn.label!.g.onclick = (event: MouseEvent) => this.label_c(event, node, conn);
   }
 
   label_dc(node: Node, conn: Connector) {
@@ -110,20 +109,22 @@ export default class ConnectorBuilder {
     }
   }
 
-  label_c(e: MouseEvent, conn: Connector) {
+  label_c(e: MouseEvent, node: Node, conn: Connector) {
     this.unselect();
     if (!conn.self) {
-      this.createHorizonDisc(conn);
-      this.createHorizonDisc(conn.pairConn!);
+      this.createHorizonDisc(node, conn);
+      this.createHorizonDisc(conn.nextNode, conn.pairConn!);
     }
     this.select(conn, true);
     e.stopPropagation();
   }
 
-  createHorizonDisc(conn: Connector) {
+  createHorizonDisc(node: Node, conn: Connector) {
     let disc = ConnHelper.createHorizonDisc(conn.horizon!.point!);
     conn.horizon!.elem = disc;
     this.svg.append(disc);
+    disc.onmousedown = (event: MouseEvent) => this.disc_md(event, node, conn);
+    disc.onclick = (event: MouseEvent) => event.stopPropagation();
   }
 
   select(conn: Connector, is: boolean) {
@@ -150,6 +151,44 @@ export default class ConnectorBuilder {
       });
   }
 
+  disc_md(e: MouseEvent, node: Node, connector: Connector) {
+    if (e.button === 0) {
+      this.connector = connector;
+      this.svg.onmousemove = (event: MouseEvent) => this.disc_mm(event, node);
+      this.svg.onmouseup = (event: MouseEvent) => this.disc_mu(event, node);
+      e.stopPropagation();
+    }
+  }
+
+  disc_mm(e: MouseEvent, node: Node) {
+    if (e.button === 0) {
+      let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
+      hPoint1 = { X: e.offsetX, Y: e.offsetY };
+      node.setPoint(horizon!);
+      horizon!.elem!.setAttribute("x", e.offsetX.toString());
+      horizon!.elem!.setAttribute("y", e.offsetY.toString());
+      let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
+      lbl?.g.setAttribute('transform', `translate(${lblPoint.X - lbl.size.X / 2},${lblPoint.Y - lbl.size.Y / 2})`);
+      let pathD: string = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
+      this.connector!.path.setAttribute('d', pathD);
+      if (!this.connector!.toDest) {
+        let phi = Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
+        this.connector!.arrow!.setAttribute('transform', `translate(${p1.X},${p1.Y}) rotate(${phi * 180 / Math.PI})`);
+      }
+    }
+  }
+
+  disc_mu(e: MouseEvent, node: Node) {
+    if (e.button === 0 && this.connector) {
+      node.setRatio(this.connector!);
+      this.connector.side = node.connSide(this.connector.nextNode);
+      node.arrangeSides();
+      this.updateAllConn(node);
+      this.svg.onmousemove = null;
+      this.svg.onmouseup = null;
+      this.connector = undefined;
+    }
+  }
 
   label_md(e: MouseEvent, node: Node, connector: Connector) {
     if (e.button === 0 && !this.origin) {
@@ -226,31 +265,31 @@ export default class ConnectorBuilder {
   }
 
   updateConn(node: Node, side: Side) {
-    node.connectors.filter(c => c.side.equal(side)).forEach(connector => {
-      let p1 = connector.point!;
+    node.connectors.filter(c => c.side.equal(side)).forEach(conn => {
+      let p1 = conn.point!;
       let pathD: string, labelPoint: Point;
-      if (connector.self) {
+      if (conn.self) {
         pathD = ConnHelper.roundPath(p1);
         labelPoint = { X: p1.X, Y: p1.Y - 43 };
       }
       else {
-        let p2 = connector.pairConn!.point!
-        node.setHorizon(connector, p1, p2);
-        connector.nextNode.setHorizon(connector.pairConn!, p2, p1);
-        let h1 = connector.horizon!, hPoint1 = h1.point!;
-        let h2 = connector.pairConn!.horizon!, hPoint2 = h2.point!;
+        let p2 = conn.pairConn!.point!
+        node.setHorizon(conn, p1, p2);
+        conn.nextNode.setHorizon(conn.pairConn!, p2, p1);
+        let h1 = conn.horizon!, hPoint1 = h1.point!;
+        let h2 = conn.pairConn!.horizon!, hPoint2 = h2.point!;
         node.updatePoints(p1, h1, p2, h2);
         h1.elem?.setAttribute("x", hPoint1.X.toString());
         h1.elem?.setAttribute("y", hPoint1.Y.toString());
         pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
-        let phi = connector.toDest ? Math.atan2(p2.Y - hPoint2.Y, p2.X - hPoint2.X) : Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
-        let dest = connector.toDest ? p2 : p1;
-        connector.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${phi * 180 / Math.PI})`);
-        labelPoint = { X: (p1.X + 3 * hPoint1.X + 3 * hPoint2.X + p2.X) / 8, Y: (p1.Y + 3 * hPoint1.Y + 3 * hPoint2.Y + p2.Y) / 8 };
+        let phi = conn.toDest ? Math.atan2(p2.Y - hPoint2.Y, p2.X - hPoint2.X) : Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
+        let dest = conn.toDest ? p2 : p1;
+        conn.arrow!.setAttribute('transform', `translate(${dest.X},${dest.Y}) rotate(${phi * 180 / Math.PI})`);
+        labelPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
       }
-      let lbl = connector.label;
+      let lbl = conn.label;
       lbl?.g.setAttribute('transform', `translate(${labelPoint.X - lbl.size.X / 2},${labelPoint.Y - lbl.size.Y / 2})`);
-      connector.path.setAttribute('d', pathD);
+      conn.path.setAttribute('d', pathD);
     });
   }
 

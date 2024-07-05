@@ -13,6 +13,9 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
     CircleNode.prototype.updatePoints = function (...params) { builder.updatePoints.apply(this, params) }
     CircleNode.prototype.arrangeSide = function (...params) { builder.arrangeSide.apply(this, params) }
     CircleNode.prototype.connSide = function (...params) { return builder.connSide.apply(this, params) }
+    CircleNode.prototype.setPoint = function (...params) { return builder.setPoint.apply(this, params) };
+    CircleNode.prototype.setRatio = function (...params) { return builder.setRatio.apply(this, params) };
+
   }
 
   setHorizon = function (this: CircleNode, conn: Connector, origin: Point, dest: Point): void {
@@ -60,6 +63,15 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
 
   connSide = function (this: CircleNode, node2: Node): CircleSide {
     return new CircleSide();
+  }
+
+  setPoint = function (this: CircleNode, hrz: Horizon): Point {
+    return { X: 0, Y: 0 };
+  }
+
+
+  setRatio = function (this: CircleNode, conn: Connector): [number, number] {
+    return [0, 0];
   }
 
   setSize(n: CircleNode): void {

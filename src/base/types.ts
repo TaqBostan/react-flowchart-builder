@@ -24,7 +24,11 @@ export abstract class Node {
 
   arrangeSide(side: Side) { }
 
-  connSide(node2: Node): Side { throw Error(); }
+  connSide(node2: Node): Side { throw Error(); } 
+
+  setPoint(hrz: Horizon): Point { throw Error(); }
+
+  setRatio(conn: Connector): [number,number] {throw Error();}
 
   grouping() {
     this.group.append(this.box);

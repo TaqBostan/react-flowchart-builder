@@ -11,6 +11,8 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
     RhomNode.prototype.updatePoints = function (...params) { builder.updatePoints.apply(this, params) }
     RhomNode.prototype.arrangeSide = function (...params) { builder.arrangeSide.apply(this, params) }
     RhomNode.prototype.connSide = function (...params) { return builder.connSide.apply(this, params) }
+    RhomNode.prototype.setPoint = function (...params) { return builder.setPoint.apply(this, params) };
+    RhomNode.prototype.setRatio = function (...params) { return builder.setRatio.apply(this, params) };
   }
 
   setHorizon = function (this: RhomNode, conn: Connector, origin: Point, dest: Point): void {
@@ -37,13 +39,21 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
     let sideCenter = this.sideCenter(side as RhomSide);
     this.connectors.filter(c => c.side.equal(side as RhomSide)).forEach(c => { c.point = sideCenter; });
   }
-  
-  connSide= function(this: RhomNode, node2: Node): RhomSide {
+
+  connSide = function (this: RhomNode, node2: Node): RhomSide {
     if (this.id === node2.id) return new RhomSide(true, true);
     let c1 = this.center(), w1 = this.diameter, h1 = this.diameter, c2 = node2.center();
     let vertical = Math.abs(c2.Y - c1.Y) * w1 > Math.abs(c2.X - c1.X) * h1;
     let firstSide = vertical ? (c2.Y < c1.Y) : (c2.X < c1.X);
     return new RhomSide(vertical, firstSide);
+  }
+
+  setPoint = function (this: RhomNode, hrz: Horizon): Point {
+    return { X: 0, Y: 0 };
+  }
+
+  setRatio = function (this: RhomNode, conn: Connector): [number, number] {
+    return [0, 0];
   }
 
   setSize(n: RhomNode): void {
