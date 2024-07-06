@@ -45,7 +45,14 @@ const Flowchart = (props: FlowchartProps) => {
   }, []);
 
   useEffect(() => {
-    if (wrapper.current) onload(wrapper.current)
+    const onkeyup = (e: KeyboardEvent) => Director.instance.win_ku(e);
+    if (wrapper.current) {
+      onload(wrapper.current);
+      window.addEventListener('keyup', onkeyup);
+    }
+    return () => { 
+      window.removeEventListener('keyup', onkeyup);
+    }
   }, [wrapper, onload]);
 
   const wrapperCss: CSSProperties = {
