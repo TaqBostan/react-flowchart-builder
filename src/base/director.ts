@@ -17,7 +17,6 @@ export default class Director {
     let parent = svg.parentElement!;
     this.connBuilder = new ConnectorBuilder(svg, this.nodes);
     this.builders = [new RectBuilder(svg, this.connBuilder, Director.sd), new CircleBuilder(svg, this.connBuilder, Director.sd), new RhomBuilder(svg, this.connBuilder, Director.sd)];
-    window.onkeyup = (event: KeyboardEvent) => this.win_ku(event);
     parent.onmousedown = (event: MouseEvent) => this.drag_md(event);
     parent.onclick = () => this.parent_c();
     parent.addEventListener('wheel', (e: WheelEvent) => this.mousewheel(e))
