@@ -1,6 +1,7 @@
 
 import ConnectorBuilder from './connector-builder';
 import { Node, Point, StaticData } from './types'
+import Util from './util';
 
 export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
@@ -40,23 +41,24 @@ export default abstract class NodeBuilder<N extends Node> {
       n.source.setAttribute('rx', '3');
       n.source.setAttribute('fill', 'orange');
     }
+    this.updateNode(n);
+    return n;
+  }
 
+  updateNode(n: Node) {
     this.setSize(n);
     n.label.setAttribute('x', ((n.box as any).getBBox().width / 2 - 1).toString());
-
-    return n;
+    n.label.setAttribute('y', n.labelY(n.label.getBBox().height).toString());
   }
 
   delete(n: Node) {
     n.group.remove();
   }
 
-  draggable(node: Node) {
+  nodeEvent(node: Node) {
     node.group.onmousedown = (event: MouseEvent) => this.node_md(event, node);
-  }
-
-  clickable(node: Node) {
     node.group.onclick = (event: MouseEvent) => this.node_c(event, node);
+    node.group.ondblclick = (event: MouseEvent) => this.node_dc(event, node);
   }
 
   node_c(e: MouseEvent, node: Node) {
@@ -71,6 +73,36 @@ export default abstract class NodeBuilder<N extends Node> {
     n.box.setAttribute('stroke', is ? 'green' : 'black');
     n.box.setAttribute('stroke-width', is ? '2' : '1');
     n.box.setAttribute('filter', is ? 'url(#flt)' : '');
+  }
+
+  node_dc(e: MouseEvent, node: Node) {
+    node.group.onmousedown = node.group.ondblclick = null;
+    let lbl = node.label!, width = lbl.getBBox().width + 14, height = 17;
+    lbl.setAttribute('visibility', 'hidden');
+    lbl.setAttribute('width', (width + 2).toString());
+    lbl.setAttribute('height', (height + 2).toString());
+    let { foreign, input } = Util.createLabelInput(width, height, 7, node.labelY(height, false), lbl.innerHTML);
+    lbl.after(foreign);
+    input.focus();
+    input.oninput = () => {
+      lbl.innerHTML = input.value;
+      lbl.setAttribute('width', `${input.offsetWidth + 2}`);
+      input.style.width = (lbl.getBBox().width + 14) + "px";
+      foreign.setAttribute("width", `${input.offsetWidth}`);
+    }
+    input.onblur = () => {
+      lbl.innerHTML = input.value;
+      lbl.removeAttribute('visibility');
+      foreign.remove();
+      this.updateNode(node);
+      node.arrangeSides();
+      this.connBuilder.updateAllConn(node);
+      this.nodeEvent(node);
+    }
+    input.onkeyup = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') input.onblur?.(new FocusEvent('blur'));
+    }
+    e.stopPropagation();
   }
 
   node_md(e: MouseEvent, node: Node) {

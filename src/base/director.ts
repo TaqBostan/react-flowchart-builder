@@ -139,8 +139,7 @@ export default class Director {
     if (node.id !== 0 && this.nodes.some(n => n.id === node.id)) throw Error('Duplicate ID found: ' + node.id);
     let builder = this.getBuilder(node);
     builder.add(node);
-    builder.draggable(node);
-    builder.clickable(node);
+    builder.nodeEvent(node);
     this.connBuilder.sourceAction(node);
     this.nodes.push(node);
     return node.id;

@@ -10,6 +10,7 @@ export abstract class Node {
   selected = false;
   abstract center(): Point;
   abstract allSides(): Side[];
+  abstract getHeight(): number;
 
   constructor(public id: number, public left: number, public top: number, public text: string, public shape: string) {
   }
@@ -24,11 +25,11 @@ export abstract class Node {
 
   arrangeSide(side: Side) { }
 
-  connSide(node2: Node): Side { throw Error(); } 
+  connSide(node2: Node): Side { throw Error(); }
 
   setPoint(hrz: Horizon): Point { throw Error(); }
 
-  setRatio(conn: Connector): [number,number] {throw Error();}
+  setRatio(conn: Connector): [number, number] { throw Error(); }
 
   grouping() {
     this.group.append(this.box);
@@ -40,6 +41,10 @@ export abstract class Node {
     this.top = top;
     this.left = left;
     this.group.setAttribute('transform', `translate(${left},${top})`);
+  }
+
+  labelY(h: number, middle: boolean = true): number {
+    return (this.getHeight() / 2 + (middle ? 1 : -1) * h / 2 - 3.5);
   }
 }
 

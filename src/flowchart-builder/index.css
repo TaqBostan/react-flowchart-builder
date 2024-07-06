@@ -13,6 +13,7 @@
   border:0;
   font-size:14px;
   font-family: inherit;
+  outline: none;
 }
 
 .node-txt {

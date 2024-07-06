@@ -65,6 +65,5 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
     n.box.setAttribute('points', strPoints);
     n.source.setAttribute('x', (n.diameter - 25).toString());
     n.source.setAttribute('y', (n.diameter / 2 - 6).toString());
-    n.label.setAttribute('y', (n.diameter / 2 + n.label.getBBox().height / 2 - 3.5).toString());
   }
 }

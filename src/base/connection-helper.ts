@@ -8,7 +8,7 @@ export default class ConnectionHelper {
   static labelPos(a: Point, b: Point, h1: Point, h2: Point) {
     return { X: (a.X + 3 * h1.X + 3 * h2.X + b.X) / 8, Y: (a.Y + 3 * h1.Y + 3 * h2.Y + b.Y) / 8 }
   }
-  
+
   static pointerInfo(a: Point, b: Point) {
     let d = [(b.X - a.X) / 2.5, (b.Y - a.Y) / 2.5], sign = d[0] > 0 ? 1 : -1, v = [sign * d[1] / 5, -sign * d[0] / 5];
     let p1 = [a.X + d[0] + v[0], a.Y + d[1] + v[1]];
@@ -26,22 +26,6 @@ export default class ConnectionHelper {
     c.setAttribute("class", "connector");
     this.setPath(c, type);
     return c;
-  }
-  static createLabelInput(width: number, height: number, text: string | undefined) {
-    let f = document.createElementNS(ns, 'foreignObject') as SVGForeignObjectElement;
-    let div = document.createElement('div');
-    let input = document.createElement('input');
-    f.setAttribute("width", `${width}`);
-    f.setAttribute("height", `${height}`);
-    f.setAttribute("x", "1");
-    f.setAttribute("y", "1");
-    div.setAttribute("xmlns", ns);
-    if (text) input.value = text;
-    input.setAttribute("class", 'lbl-input');
-    input.style.width = width + "px";
-    div.append(input);
-    f.append(div);
-    return { foreign: f, input };
   }
 
   static setPath(path: SVGPathElement, type: string) {

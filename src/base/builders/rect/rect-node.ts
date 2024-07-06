@@ -5,7 +5,7 @@ export class RectNode extends Node {
   box: SVGRectElement = document.createElementNS(ns, 'rect') as SVGRectElement;
   ratio = { h: 0.333, v: 0.167};
   constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 30) {
-    super(id, left, top, text, 'rectangle')
+    super(id, left, top, text, 'rectangle');
   }
 
   center(): Point {
@@ -20,6 +20,10 @@ export class RectNode extends Node {
 
   allSides(): Side[] {
     return [new RectSide(true, true), new RectSide(true, false), new RectSide(false, true), new RectSide(false, false)];
+  }
+  
+  getHeight(): number {
+    return this.height;
   }
 }
 
