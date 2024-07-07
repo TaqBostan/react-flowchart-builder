@@ -238,6 +238,7 @@ export default class ConnectorBuilder {
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'connectable');
         n.box.onmouseup = () => this.connect(n);
+        n.label.onmouseup = () => this.connect(n);
       });
       e.stopPropagation();
     }

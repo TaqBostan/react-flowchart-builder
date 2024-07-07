@@ -12,7 +12,7 @@ export abstract class Node {
   abstract allSides(): Side[];
   abstract getHeight(): number;
 
-  constructor(public id: number, public left: number, public top: number, public text: string, public shape: string) {
+  constructor(public id: number, public left: number, public top: number, public text: string, public color: string, public shape: string) {
   }
 
   arrangeSides() {
@@ -33,8 +33,8 @@ export abstract class Node {
 
   grouping() {
     this.group.append(this.box);
-    this.box.before(this.label);
-    this.group.append(this.source);
+    this.box.after(this.label);
+    this.label.after(this.source);
   }
 
   move(left: number, top: number) {
@@ -52,7 +52,7 @@ export abstract class Side {
   abstract equal(s: Side): boolean;
 }
 
-export type NodeData = { id?: number, X: number, Y: number, text: string, shape?: string }
+export type NodeData = { id?: number, X: number, Y: number, text: string,color?:string, shape?: string }
 
 export type Horizon = { point?: Point, ratioH: number, ratioV: number, elem?: SVGRectElement }
 

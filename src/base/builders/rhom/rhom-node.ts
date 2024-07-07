@@ -4,8 +4,8 @@ import { Node, ns, Point, Side } from "../../types";
 export class RhomNode extends Node {
   box: SVGPolygonElement = document.createElementNS(ns, 'polygon') as SVGPolygonElement;
   ratio = { h: 0.333, v: 0 };
-  constructor(public id: number, public left: number, public top: number, public text: string, public diameter: number = 0) {
-    super(id, left, top, text, 'rhombus');
+  constructor(public id: number, public left: number, public top: number, public text: string, public color: string, public diameter: number = 0) {
+    super(id, left, top, text, color, 'rhombus');
   }
 
   center(): Point {

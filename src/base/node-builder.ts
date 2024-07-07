@@ -26,7 +26,7 @@ export default abstract class NodeBuilder<N extends Node> {
     n.box.setAttribute('class', 'grabbable');
     n.box.setAttribute('stroke', 'black');
     n.box.setAttribute('stroke-width', '1');
-    n.box.setAttribute('fill', 'transparent');
+    n.box.setAttribute('fill', n.color);
 
     n.label.setAttribute('text-anchor', 'middle');
     n.label.setAttribute('class', 'no-select node-txt');

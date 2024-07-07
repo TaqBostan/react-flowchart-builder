@@ -12,19 +12,19 @@ const Flowchart = (props: FlowchartProps) => {
   const getDirector = () => Director.instance;
 
   const getHandles = () => ({
-    addRectNode(left: number, top: number, text: string, id?: number) {
-      return getDirector().addNode(new RectNode(id || 0, left, top, text));
+    addRectNode(left: number, top: number, text: string, id?: number, color: string = "transparent") {
+      return getDirector().addNode(new RectNode(id || 0, left, top, text, color));
     },
-    addCircleNode(left: number, top: number, text: string, id?: number) {
-      return getDirector().addNode(new CircleNode(id || 0, left, top, text));
+    addCircleNode(left: number, top: number, text: string, id?: number, color: string = "transparent") {
+      return getDirector().addNode(new CircleNode(id || 0, left, top, text, color));
     },
-    addRhomNode(left: number, top: number, text: string, id?: number) {
-      return getDirector().addNode(new RhomNode(id || 0, left, top, text));
+    addRhomNode(left: number, top: number, text: string, id?: number, color: string = "transparent") {
+      return getDirector().addNode(new RhomNode(id || 0, left, top, text, color));
     },
     addNodes(nodes: NodeData[], conns: ConnectorData[] = []) {
-      let rectangles = nodes.filter(n => !n.shape || n.shape === 'rectangle').map(n => new RectNode(n.id || 0, n.X, n.Y, n.text))
-      let circles = nodes.filter(n => n.shape === 'circle').map(n => new CircleNode(n.id || 0, n.X, n.Y, n.text))
-      let rhombuses = nodes.filter(n => n.shape === 'rhombus').map(n => new RhomNode(n.id || 0, n.X, n.Y, n.text))
+      let rectangles = nodes.filter(n => !n.shape || n.shape === 'rectangle').map(n => new RectNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
+      let circles = nodes.filter(n => n.shape === 'circle').map(n => new CircleNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
+      let rhombuses = nodes.filter(n => n.shape === 'rhombus').map(n => new RhomNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
       getDirector().addNodes(rectangles);
       getDirector().addNodes(circles);
       getDirector().addNodes(rhombuses);
@@ -50,7 +50,7 @@ const Flowchart = (props: FlowchartProps) => {
       onload(wrapper.current);
       window.addEventListener('keyup', onkeyup);
     }
-    return () => { 
+    return () => {
       window.removeEventListener('keyup', onkeyup);
     }
   }, [wrapper, onload]);

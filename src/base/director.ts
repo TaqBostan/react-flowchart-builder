@@ -103,7 +103,7 @@ export default class Director {
 
   getData() {
     return {
-      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape })),
+      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape, color: n.color })),
       connectors: this.nodes.reduce(
         (conns: ConnectorData[], node) => [...conns,
         ...node.connectors

@@ -1,6 +1,6 @@
 .lbl-box {
-  stroke:rgb(66, 111, 122);
-  stroke-width:0.5;
+  stroke: rgb(66, 111, 122);
+  stroke-width: 0.5;
   fill: #eee99c80;
 }
 
@@ -10,8 +10,8 @@
 }
 
 .lbl-input {
-  border:0;
-  font-size:14px;
+  border: 0;
+  font-size: 14px;
   font-family: inherit;
   outline: none;
 }
@@ -26,7 +26,9 @@
   display: none;
 }
 
-.grabbable:hover + .source, .source:hover {
+.grabbable:hover+text+.source,
+text:hover+.source,
+.source:hover {
   display: block;
 }
 
@@ -41,12 +43,13 @@
   cursor: move;
 }
 
-.wp-svg:active, .grabbable:active {
+.wp-svg:active,
+.grabbable:active {
   cursor: grabbing;
 }
 
 .connectable:hover {
-  stroke:rgb(34, 112, 79);
+  stroke: rgb(34, 112, 79);
 }
 
 .the-svg {
@@ -57,8 +60,8 @@
 }
 
 .connector {
-  fill:none;
-  stroke-width:1.25;
+  fill: none;
+  stroke-width: 1.25;
 }
 
 .no-select {
