@@ -7,8 +7,10 @@ export default class ConnectorBuilder {
   origin?: Point;
   sourceNode?: Node;
   connector?: Connector;
+  ctr: HTMLElement;
 
   constructor(public svg: SVGSVGElement, public nodes: Node[]) {
+    this.ctr = this.svg.parentElement!;
   }
 
   sourceAction(node: Node) {
@@ -21,8 +23,8 @@ export default class ConnectorBuilder {
       this.sourceNode = node;
       this.sourceNode.pointer = ConnHelper.createPointer();
       this.nodes[0].group.before(this.sourceNode.pointer!);
-      this.svg.onmousemove = (event: MouseEvent) => this.source_mm(event);
-      this.svg.onmouseup = () => this.source_mu();
+      this.ctr.onmousemove = (event: MouseEvent) => this.source_mm(event);
+      this.ctr.onmouseup = () => this.source_mu();
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'connectable');
         n.box.onmouseup = () => this.connect(n);
@@ -42,8 +44,8 @@ export default class ConnectorBuilder {
   source_mu() {
     if (this.origin) {
       this.sourceNode!.pointer!.remove();
-      this.svg.onmousemove = null;
-      this.svg.onmouseup = null;
+      this.ctr.onmousemove = null;
+      this.ctr.onmouseup = null;
       this.origin = undefined;
       this.sourceNode = undefined;
       this.nodes.forEach(n => {
@@ -148,8 +150,8 @@ export default class ConnectorBuilder {
       this.origin = { X: e.offsetX, Y: e.offsetY };
       this.sourceNode = node;
       this.connector = connector;
-      this.svg.onmousemove = (event: MouseEvent) => this.label_mm(event);
-      this.svg.onmouseup = (event: MouseEvent) => this.label_mu(event);
+      this.ctr.onmousemove = (event: MouseEvent) => this.label_mm(event);
+      this.ctr.onmouseup = (event: MouseEvent) => this.label_mu(event);
       e.stopPropagation();
     }
   }
@@ -177,8 +179,8 @@ export default class ConnectorBuilder {
         this.delete(this.connector!);
       }
       else this.connector.group.removeAttribute('transform');
-      this.svg.onmousemove = null;
-      this.svg.onmouseup = null;
+      this.ctr.onmousemove = null;
+      this.ctr.onmouseup = null;
       this.origin = undefined;
       this.sourceNode = undefined;
       this.connector = undefined;
@@ -220,8 +222,8 @@ export default class ConnectorBuilder {
   disc_md(e: MouseEvent, node: Node, connector: Connector) {
     if (e.buttons === 1) {
       this.connector = connector;
-      this.svg.onmousemove = (event: MouseEvent) => this.disc_mm(event, node);
-      this.svg.onmouseup = (event: MouseEvent) => this.disc_mu(node);
+      this.ctr.onmousemove = (event: MouseEvent) => this.disc_mm(event, node);
+      this.ctr.onmouseup = (event: MouseEvent) => this.disc_mu(node);
       e.stopPropagation();
     }
   }
@@ -249,8 +251,8 @@ export default class ConnectorBuilder {
       //this.connector.side = node.connSide(this.connector.nextNode);
       //node.arrangeSides();
       this.updateAllConn(node);
-      this.svg.onmousemove = null;
-      this.svg.onmouseup = null;
+      this.ctr.onmousemove = null;
+      this.ctr.onmouseup = null;
       this.connector = undefined;
     }
   }

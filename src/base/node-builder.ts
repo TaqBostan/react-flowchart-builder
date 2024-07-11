@@ -8,12 +8,14 @@ export default abstract class NodeBuilder<N extends Node> {
   origin?: Point;
   node?: Node;
   nodes: Node[];
+  ctr: HTMLElement;
   abstract ofType<T extends Node>(node: T): boolean;
   abstract setSize(n: Node): void;
   abstract nodeProto(): void;
 
   constructor(public svg: SVGSVGElement, public connBuilder: ConnectorBuilder, public sd: StaticData) {
     this.nodes = this.connBuilder.nodes;
+    this.ctr = this.svg.parentElement!;
     this.nodeProto();
   }
 
@@ -109,7 +111,7 @@ export default abstract class NodeBuilder<N extends Node> {
     if (e.buttons === 1 && !this.origin) {
       this.origin = { X: e.clientX, Y: e.clientY };
       this.node = node;
-      this.svg.parentElement!.onmousemove = (event: MouseEvent) => this.node_mm(event);
+      this.ctr.onmousemove = (event: MouseEvent) => this.node_mm(event);
       node.group.onmouseup = () => this.node_mu();
       e.stopPropagation();
     }
@@ -136,7 +138,7 @@ export default abstract class NodeBuilder<N extends Node> {
 
   node_mu() {
     if (this.origin) {
-      this.svg.onmousemove = null;
+      this.ctr.onmousemove = null;
       this.node!.group.onmouseup = null;
       this.origin = undefined;
       this.node = undefined;
