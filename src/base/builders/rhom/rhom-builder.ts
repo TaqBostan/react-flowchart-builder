@@ -11,8 +11,8 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
     RhomNode.prototype.updatePoints = function (...params) { builder.updatePoints.apply(this, params) }
     RhomNode.prototype.arrangeSide = function (...params) { builder.arrangeSide.apply(this, params) }
     RhomNode.prototype.connSide = function (...params) { return builder.connSide.apply(this, params) }
-    RhomNode.prototype.setPoint = function (...params) { return builder.setPoint.apply(this, params) };
-    RhomNode.prototype.setRatio = function (...params) { return builder.setRatio.apply(this, params) };
+    RhomNode.prototype.setPoint = function (...params) { builder.setPoint.apply(this, params) };
+    RhomNode.prototype.setRatio = function (...params) { builder.setRatio.apply(this, params) };
   }
 
   setHorizon = function (this: RhomNode, conn: Connector, origin: Point, dest: Point): void {
@@ -48,12 +48,10 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
     return new RhomSide(vertical, firstSide);
   }
 
-  setPoint = function (this: RhomNode, hrz: Horizon): Point {
-    return { X: 0, Y: 0 };
+  setPoint = function (this: RhomNode, conn: Connector, hrzP: Point) {
   }
 
-  setRatio = function (this: RhomNode, conn: Connector): [number, number] {
-    return [0, 0];
+  setRatio = function (this: RhomNode, conn: Connector) {
   }
 
   setSize(n: RhomNode): void {

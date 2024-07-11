@@ -26,6 +26,7 @@ export default class ConnectorBuilder {
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'connectable');
         n.box.onmouseup = () => this.connect(n);
+        n.box.before(n.label);
       });
       e.stopPropagation();
     }
@@ -48,6 +49,7 @@ export default class ConnectorBuilder {
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'grabbable');
         n.box.onmouseup = null;
+        n.box.after(n.label);
       });
     }
   }
@@ -227,8 +229,8 @@ export default class ConnectorBuilder {
   disc_mm(e: MouseEvent, node: Node) {
     if (e.buttons !== 1) return this.disc_mu(node);
     let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
-    hPoint1 = { X: e.offsetX, Y: e.offsetY };
-    node.setPoint(horizon!);
+    hPoint1.X = e.offsetX, hPoint1.Y = e.offsetY;
+    node.setPoint(this.connector!, hPoint1);
     horizon!.elem!.setAttribute("x", e.offsetX.toString());
     horizon!.elem!.setAttribute("y", e.offsetY.toString());
     let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
@@ -244,8 +246,8 @@ export default class ConnectorBuilder {
   disc_mu(node: Node) {
     if (this.connector) {
       node.setRatio(this.connector!);
-      this.connector.side = node.connSide(this.connector.nextNode);
-      node.arrangeSides();
+      //this.connector.side = node.connSide(this.connector.nextNode);
+      //node.arrangeSides();
       this.updateAllConn(node);
       this.svg.onmousemove = null;
       this.svg.onmouseup = null;
