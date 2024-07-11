@@ -21,7 +21,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     if (conn.horizon === undefined) conn.horizon = { ratioH: this.ratio.h, ratioV: this.ratio.v };
     if (conn.horizon.point === undefined) conn.horizon.point = { X: 0, Y: 0 };
     let horizontal = [(dest.X - origin.X) * conn.horizon.ratioH, (dest.Y - origin.Y) * conn.horizon.ratioH],
-      sign = horizontal[0] > 0 ? 1 : -1,
+      sign = dest.X > origin.X ? 1 : -1,
       vertical = [sign * horizontal[1] * conn.horizon.ratioV, -sign * horizontal[0] * conn.horizon.ratioV];
     conn.horizon.point!.X = origin.X + horizontal[0] + vertical[0];
     conn.horizon.point!.Y = origin.Y + horizontal[1] + vertical[1];
@@ -65,9 +65,9 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   }
 
   setRatio = function (this: RectNode, conn: Connector) {
-    let origin = conn.point!, dest = conn.pairConn!.point!, hrzP = conn.horizon!.point!, sign = hrzP.X > origin.X ? 1 : -1;
+    let origin = conn.point!, dest = conn.pairConn!.point!, hrzP = conn.horizon!.point!, sign = dest.X > origin.X ? 1 : -1;
     let deltaHrzX = hrzP.X - origin.X, deltaHrzY = hrzP.Y - origin.Y, deltaDestX = dest.X - origin.X, deltaDestY = dest.Y - origin.Y;
-    conn.horizon!.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / (deltaHrzY * deltaDestY + deltaHrzX * deltaDestX)
+    conn.horizon!.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / (deltaHrzX * deltaDestX + deltaHrzY * deltaDestY)
     conn.horizon!.ratioH = deltaHrzX / (deltaDestX + sign * deltaDestY * conn.horizon!.ratioV);
   }
 
