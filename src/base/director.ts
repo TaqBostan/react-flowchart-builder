@@ -64,24 +64,25 @@ export default class Director {
   }
 
   drag_md(e: MouseEvent) {
-    if (e.button === 0 && !this.origin) {
+    if (e.buttons === 1 && !this.origin) {
       let parent = this.svg.parentElement!;
       this.origin = { X: e.clientX, Y: e.clientY };
       parent.onmousemove = (event: MouseEvent) => this.drag_mm(event);
-      parent.onmouseup = (event: MouseEvent) => this.drag_mu(event);
+      parent.onmouseup = () => this.drag_mu();
     }
   }
 
   drag_mm(e: MouseEvent) {
-    if (e.button === 0 && this.origin) {
+    if (this.origin) {
+      if(e.buttons !== 1) return this.drag_mu();
       this.svg.style.left = (parseFloat(this.svg.style.left) + (e.clientX - this.origin.X)) + 'px';
       this.svg.style.top = (parseFloat(this.svg.style.top) + (e.clientY - this.origin.Y)) + 'px';
       this.origin = { X: e.clientX, Y: e.clientY };
     }
   }
 
-  drag_mu(e: MouseEvent) {
-    if (e.button === 0 && this.origin) {
+  drag_mu() {
+    if (this.origin) {
       this.svg.parentElement!.onmousemove = null;
       this.svg.parentElement!.onmouseup = null;
       this.origin = undefined;

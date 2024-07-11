@@ -74,17 +74,18 @@ export default abstract class NodeBuilder<N extends Node> {
   }
 
   node_md(e: MouseEvent, node: Node) {
-    if (e.button === 0 && !this.origin) {
+    if (e.buttons === 1 && !this.origin) {
       this.origin = { X: e.clientX, Y: e.clientY };
       this.node = node;
       this.svg.parentElement!.onmousemove = (event: MouseEvent) => this.node_mm(event);
-      node.group.onmouseup = (event: MouseEvent) => this.node_mu(event);
+      node.group.onmouseup = () => this.node_mu();
       e.stopPropagation();
     }
   }
 
   node_mm(e: MouseEvent) {
-    if (e.button === 0 && this.origin && this.node) {
+    if (this.origin && this.node) {
+      if(e.buttons !== 1) return this.node_mu();
       this.node.move(this.node.left + (e.clientX - this.origin.X) / this.sd.scale, this.node.top + (e.clientY - this.origin.Y) / this.sd.scale);
       this.node.connectors.forEach(connector => {
         connector.side = this.node!.connSide(connector.nextNode);
@@ -101,8 +102,8 @@ export default abstract class NodeBuilder<N extends Node> {
     }
   }
 
-  node_mu(e: MouseEvent) {
-    if (e.button === 0 && this.origin) {
+  node_mu() {
+    if (this.origin) {
       this.svg.onmousemove = null;
       this.node!.group.onmouseup = null;
       this.origin = undefined;

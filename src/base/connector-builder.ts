@@ -15,18 +15,39 @@ export default class ConnectorBuilder {
   }
 
   source_md(e: MouseEvent, node: Node) {
-    if (e.button === 0 && !this.origin) {
+    if (e.buttons === 1 && !this.origin) {
       this.origin = { X: node.left + node.source.getBBox().x + 6, Y: node.top + node.source.getBBox().y + 6 };
       this.sourceNode = node;
       this.sourceNode.pointer = ConnHelper.createPointer();
       this.nodes[0].group.before(this.sourceNode.pointer!);
       this.svg.onmousemove = (event: MouseEvent) => this.source_mm(event);
-      this.svg.onmouseup = (event: MouseEvent) => this.source_mu(event);
+      this.svg.onmouseup = () => this.source_mu();
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'connectable');
         n.box.onmouseup = () => this.connect(n);
       });
       e.stopPropagation();
+    }
+  }
+
+  source_mm(e: MouseEvent) {
+    if (this.origin) {
+      if(e.buttons !== 1) return this.source_mu();
+      this.sourceNode!.pointer!.setAttribute('d', ConnHelper.pointerInfo(this.origin, { X: e.offsetX, Y: e.offsetY }).path);
+    }
+  }
+
+  source_mu() {
+    if (this.origin) {
+      this.sourceNode!.pointer!.remove();
+      this.svg.onmousemove = null;
+      this.svg.onmouseup = null;
+      this.origin = undefined;
+      this.sourceNode = undefined;
+      this.nodes.forEach(n => {
+        n.box.setAttribute('class', 'grabbable');
+        n.box.onmouseup = null;
+      });
     }
   }
 
@@ -152,34 +173,33 @@ export default class ConnectorBuilder {
   }
 
   disc_md(e: MouseEvent, node: Node, connector: Connector) {
-    if (e.button === 0) {
+    if (e.buttons === 1) {
       this.connector = connector;
       this.svg.onmousemove = (event: MouseEvent) => this.disc_mm(event, node);
-      this.svg.onmouseup = (event: MouseEvent) => this.disc_mu(event, node);
+      this.svg.onmouseup = (event: MouseEvent) => this.disc_mu(node);
       e.stopPropagation();
     }
   }
 
   disc_mm(e: MouseEvent, node: Node) {
-    if (e.button === 0) {
-      let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
-      hPoint1 = { X: e.offsetX, Y: e.offsetY };
-      node.setPoint(horizon!);
-      horizon!.elem!.setAttribute("x", e.offsetX.toString());
-      horizon!.elem!.setAttribute("y", e.offsetY.toString());
-      let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
-      lbl?.g.setAttribute('transform', `translate(${lblPoint.X - lbl.size.X / 2},${lblPoint.Y - lbl.size.Y / 2})`);
-      let pathD: string = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
-      this.connector!.path.setAttribute('d', pathD);
-      if (!this.connector!.toDest) {
-        let phi = Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
-        this.connector!.arrow!.setAttribute('transform', `translate(${p1.X},${p1.Y}) rotate(${phi * 180 / Math.PI})`);
-      }
+    if (e.buttons !== 1) return this.disc_mu(node);
+    let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
+    hPoint1 = { X: e.offsetX, Y: e.offsetY };
+    node.setPoint(horizon!);
+    horizon!.elem!.setAttribute("x", e.offsetX.toString());
+    horizon!.elem!.setAttribute("y", e.offsetY.toString());
+    let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
+    lbl?.g.setAttribute('transform', `translate(${lblPoint.X - lbl.size.X / 2},${lblPoint.Y - lbl.size.Y / 2})`);
+    let pathD: string = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
+    this.connector!.path.setAttribute('d', pathD);
+    if (!this.connector!.toDest) {
+      let phi = Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
+      this.connector!.arrow!.setAttribute('transform', `translate(${p1.X},${p1.Y}) rotate(${phi * 180 / Math.PI})`);
     }
   }
 
-  disc_mu(e: MouseEvent, node: Node) {
-    if (e.button === 0 && this.connector) {
+  disc_mu(node: Node) {
+    if (this.connector) {
       node.setRatio(this.connector!);
       this.connector.side = node.connSide(this.connector.nextNode);
       node.arrangeSides();
@@ -191,7 +211,7 @@ export default class ConnectorBuilder {
   }
 
   label_md(e: MouseEvent, node: Node, connector: Connector) {
-    if (e.button === 0 && !this.origin) {
+    if (e.buttons === 1 && !this.origin) {
       this.origin = { X: e.offsetX, Y: e.offsetY };
       this.sourceNode = node;
       this.connector = connector;
@@ -202,7 +222,8 @@ export default class ConnectorBuilder {
   }
 
   label_mm(e: MouseEvent) {
-    if (e.button === 0 && this.origin) {
+    if (this.origin) {
+      if (e.buttons !== 1) return this.label_mu(e);
       let tran = `translate(${e.offsetX - this.origin.X},${e.offsetY - this.origin.Y})`;
       let { group, path, arrow, horizon } = this.connector!;
       let _horizon = this.connector!.pairConn?.horizon;
@@ -216,7 +237,7 @@ export default class ConnectorBuilder {
   }
 
   label_mu(e: MouseEvent) {
-    if (e.button === 0 && this.origin && this.connector) {
+    if (this.origin && this.connector) {
       if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
         let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector!.id)!;
         this.sourceNode!.connectors.splice(index1, 1);
@@ -239,25 +260,6 @@ export default class ConnectorBuilder {
     conn.group.remove();
     conn.horizon?.elem?.remove();
     conn.pairConn?.horizon?.elem?.remove();
-  }
-
-  source_mu(e: MouseEvent) {
-    if (e.button === 0 && this.origin) {
-      this.sourceNode!.pointer!.remove();
-      this.svg.onmousemove = null;
-      this.svg.onmouseup = null;
-      this.origin = undefined;
-      this.sourceNode = undefined;
-      this.nodes.forEach(n => {
-        n.box.setAttribute('class', 'grabbable');
-        n.box.onmouseup = null;
-      });
-    }
-  }
-
-  source_mm(e: MouseEvent) {
-    if (e.button === 0 && this.origin)
-      this.sourceNode!.pointer!.setAttribute('d', ConnHelper.pointerInfo(this.origin, { X: e.offsetX, Y: e.offsetY }).path);
   }
 
   updateAllConn(node: Node) {
