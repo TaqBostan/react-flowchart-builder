@@ -69,7 +69,6 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
     return { X: 0, Y: 0 };
   }
 
-
   setRatio = function (this: CircleNode, conn: Connector): [number, number] {
     return [0, 0];
   }
@@ -81,6 +80,5 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
     n.box.setAttribute('cy', n.radius.toString());
     n.source.setAttribute('x', (2 * n.radius - 20).toString());
     n.source.setAttribute('y', (n.radius - 6).toString());
-    n.label.setAttribute('y', (n.radius + n.label.getBBox().height / 2 - 3.5).toString());
   }
 }

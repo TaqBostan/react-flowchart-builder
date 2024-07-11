@@ -1,5 +1,6 @@
 import ConnHelper from './connection-helper';
 import { Connector, Node, Point, Side, ConnectorData, ns } from './types';
+import Util from './util';
 export default class ConnectorBuilder {
   static editable: boolean;
   maxId: number = 0;
@@ -107,7 +108,7 @@ export default class ConnectorBuilder {
     lbl.elem.setAttribute('visibility', 'hidden');
     lbl.box.setAttribute('width', (width + 2).toString());
     lbl.box.setAttribute('height', (height + 2).toString());
-    let { foreign, input } = ConnHelper.createLabelInput(width, height, lbl.text);
+    let { foreign, input } = Util.createLabelInput(width, height, 1, 1, lbl.text);
     lbl.g.append(foreign);
     input.focus();
     input.oninput = () => {
@@ -138,6 +139,48 @@ export default class ConnectorBuilder {
     }
     this.select(conn, true);
     e.stopPropagation();
+  }
+
+  label_md(e: MouseEvent, node: Node, connector: Connector) {
+    if (e.buttons === 1 && !this.origin) {
+      this.origin = { X: e.offsetX, Y: e.offsetY };
+      this.sourceNode = node;
+      this.connector = connector;
+      this.svg.onmousemove = (event: MouseEvent) => this.label_mm(event);
+      this.svg.onmouseup = (event: MouseEvent) => this.label_mu(event);
+      e.stopPropagation();
+    }
+  }
+
+  label_mm(e: MouseEvent) {
+    if (this.origin) {
+      if(e.buttons !== 1) return this.label_mu(e);
+      let tran = `translate(${e.offsetX - this.origin.X},${e.offsetY - this.origin.Y})`;
+      let { group, path, arrow, horizon } = this.connector!;
+      let _horizon = this.connector!.pairConn?.horizon;
+      let color = Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40 ? 'red' : 'green';
+      group.setAttribute('transform', tran);
+      horizon?.elem?.setAttribute('transform', tran);
+      _horizon?.elem?.setAttribute('transform', tran);
+      path.setAttribute('stroke', color);
+      arrow?.setAttribute('fill', color);
+    }
+  }
+
+  label_mu(e: MouseEvent) {
+    if (this.origin && this.connector) {
+      if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
+        let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector!.id)!;
+        this.sourceNode!.connectors.splice(index1, 1);
+        this.delete(this.connector!);
+      }
+      else this.connector.group.removeAttribute('transform');
+      this.svg.onmousemove = null;
+      this.svg.onmouseup = null;
+      this.origin = undefined;
+      this.sourceNode = undefined;
+      this.connector = undefined;
+    }
   }
 
   createHorizonDisc(node: Node, conn: Connector) {
@@ -210,47 +253,6 @@ export default class ConnectorBuilder {
     }
   }
 
-  label_md(e: MouseEvent, node: Node, connector: Connector) {
-    if (e.buttons === 1 && !this.origin) {
-      this.origin = { X: e.offsetX, Y: e.offsetY };
-      this.sourceNode = node;
-      this.connector = connector;
-      this.svg.onmousemove = (event: MouseEvent) => this.label_mm(event);
-      this.svg.onmouseup = (event: MouseEvent) => this.label_mu(event);
-      e.stopPropagation();
-    }
-  }
-
-  label_mm(e: MouseEvent) {
-    if (this.origin) {
-      if (e.buttons !== 1) return this.label_mu(e);
-      let tran = `translate(${e.offsetX - this.origin.X},${e.offsetY - this.origin.Y})`;
-      let { group, path, arrow, horizon } = this.connector!;
-      let _horizon = this.connector!.pairConn?.horizon;
-      let color = Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40 ? 'red' : 'green';
-      group.setAttribute('transform', tran);
-      horizon?.elem?.setAttribute('transform', tran);
-      _horizon?.elem?.setAttribute('transform', tran);
-      path.setAttribute('stroke', color);
-      arrow?.setAttribute('fill', color);
-    }
-  }
-
-  label_mu(e: MouseEvent) {
-    if (this.origin && this.connector) {
-      if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
-        let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector!.id)!;
-        this.sourceNode!.connectors.splice(index1, 1);
-        this.delete(this.connector!);
-      }
-      else this.connector.group.removeAttribute('transform');
-      this.svg.onmousemove = null;
-      this.svg.onmouseup = null;
-      this.origin = undefined;
-      this.sourceNode = undefined;
-      this.connector = undefined;
-    }
-  }
   // removes a conn and only removes it from conn.nextNode.connectors array
   delete(conn: Connector) {
     if (!conn.self) {

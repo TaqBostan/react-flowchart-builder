@@ -10,8 +10,9 @@ export abstract class Node {
   selected = false;
   abstract center(): Point;
   abstract allSides(): Side[];
+  abstract getHeight(): number;
 
-  constructor(public id: number, public left: number, public top: number, public text: string, public shape: string) {
+  constructor(public id: number, public left: number, public top: number, public text: string, public color: string, public shape: string) {
   }
 
   arrangeSides() {
@@ -24,16 +25,16 @@ export abstract class Node {
 
   arrangeSide(side: Side) { }
 
-  connSide(node2: Node): Side { throw Error(); } 
+  connSide(node2: Node): Side { throw Error(); }
 
   setPoint(hrz: Horizon): Point { throw Error(); }
 
-  setRatio(conn: Connector): [number,number] {throw Error();}
+  setRatio(conn: Connector): [number, number] { throw Error(); }
 
   grouping() {
     this.group.append(this.box);
-    this.box.before(this.label);
-    this.group.append(this.source);
+    this.box.after(this.label);
+    this.label.after(this.source);
   }
 
   move(left: number, top: number) {
@@ -41,13 +42,17 @@ export abstract class Node {
     this.left = left;
     this.group.setAttribute('transform', `translate(${left},${top})`);
   }
+
+  labelY(h: number, middle: boolean = true): number {
+    return (this.getHeight() / 2 + (middle ? 1 : -1) * h / 2 - 3.5);
+  }
 }
 
 export abstract class Side {
   abstract equal(s: Side): boolean;
 }
 
-export type NodeData = { id?: number, X: number, Y: number, text: string, shape?: string }
+export type NodeData = { id?: number, X: number, Y: number, text: string,color?:string, shape?: string }
 
 export type Horizon = { point?: Point, ratioH: number, ratioV: number, elem?: SVGRectElement }
 

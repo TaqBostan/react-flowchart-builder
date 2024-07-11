@@ -3,15 +3,15 @@ import { Node, ns, Point, Side } from "../../types";
 
 export class RectNode extends Node {
   box: SVGRectElement = document.createElementNS(ns, 'rect') as SVGRectElement;
-  ratio = { h: 0.333, v: 0.167};
-  constructor(public id: number, public left: number, public top: number, public text: string, public width: number = 0, public height: number = 30) {
-    super(id, left, top, text, 'rectangle')
+  ratio = { h: 0.333, v: 0.167 };
+  constructor(public id: number, public left: number, public top: number, public text: string, public color: string, public width: number = 0, public height: number = 30) {
+    super(id, left, top, text, color, 'rectangle');
   }
 
   center(): Point {
     return { X: this.left + this.width / 2, Y: this.top + this.height / 2 };
-  } 
-  
+  }
+
   sideCenter(side: RectSide): Point {
     let center = this.center(), sign = side.firstSide ? -1 : 1;
     if (side.vertical) return { X: center.X, Y: center.Y + sign * this.height / 2 };
@@ -20,6 +20,10 @@ export class RectNode extends Node {
 
   allSides(): Side[] {
     return [new RectSide(true, true), new RectSide(true, false), new RectSide(false, true), new RectSide(false, false)];
+  }
+
+  getHeight(): number {
+    return this.height;
   }
 }
 

@@ -104,7 +104,7 @@ export default class Director {
 
   getData() {
     return {
-      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape })),
+      nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape, color: n.color })),
       connectors: this.nodes.reduce(
         (conns: ConnectorData[], node) => [...conns,
         ...node.connectors
@@ -139,8 +139,7 @@ export default class Director {
     if (node.id !== 0 && this.nodes.some(n => n.id === node.id)) throw Error('Duplicate ID found: ' + node.id);
     let builder = this.getBuilder(node);
     builder.add(node);
-    builder.draggable(node);
-    builder.clickable(node);
+    builder.nodeEvent(node);
     this.connBuilder.sourceAction(node);
     this.nodes.push(node);
     return node.id;
