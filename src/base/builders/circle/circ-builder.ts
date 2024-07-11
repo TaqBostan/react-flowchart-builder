@@ -66,9 +66,17 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
   }
 
   setPoint = function (this: CircleNode, conn: Connector, hrzP: Point) {
+    let center = this.center(), phi = Math.atan2(hrzP.Y - center.Y, hrzP.X - center.X), ConnP = conn.point!;
+    ConnP.X = center.X + this.radius * Math.cos(phi);
+    ConnP.Y = center.Y + this.radius * Math.sin(phi);
   }
 
   setRatio = function (this: CircleNode, conn: Connector) {
+    let origin = conn.point!, dest = conn.pairConn!.point!, hrzP = conn.horizon!.point!, sign = dest.X < origin.X ? 1 : -1;
+    let horizontal = [dest.X - origin.X, dest.Y - origin.Y], vertical = [-sign * horizontal[1], sign * horizontal[0]];
+    let deltaHrzX = hrzP.X - origin.X, deltaHrzY = hrzP.Y - origin.Y;
+    conn.horizon!.ratioV = (horizontal[1] * deltaHrzX - horizontal[0] * deltaHrzY) / (vertical[0] * horizontal[1] - vertical[1] * horizontal[0]);
+    conn.horizon!.ratioH = (vertical[1] * deltaHrzX - vertical[0] * deltaHrzY) / (horizontal[0] * vertical[1] - horizontal[1] * vertical[0]);
   }
 
   setSize(n: CircleNode): void {
