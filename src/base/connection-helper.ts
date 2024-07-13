@@ -98,13 +98,13 @@ export default class ConnectionHelper {
     return p;
   }
 
-  static createHorizonDisc(point: Point): SVGRectElement {
+  static createHrzDisc(point: Point): SVGRectElement {
     let disc: SVGRectElement = document.createElementNS(ns, 'rect');
-    disc.setAttribute('height', "7");
-    disc.setAttribute('width', "7");
+    disc.setAttribute('height', "8");
+    disc.setAttribute('width', "8");
     disc.setAttribute('fill', 'green');
-    disc.setAttribute("x", (point.X - 3.5).toString());
-    disc.setAttribute("y", (point.Y - 3.5).toString())
+    disc.setAttribute("x", (point.X - 4).toString());
+    disc.setAttribute("y", (point.Y - 4).toString())
     disc.classList.add('grabbable');
     return disc;
   }

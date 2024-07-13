@@ -1,15 +1,15 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side, ConnectorData, ns } from './types';
+import { Connector, Node, Point, Side, ConnectorData, ns, StaticData } from './types';
 import Util from './util';
 export default class ConnectorBuilder {
   static editable: boolean;
   maxId: number = 0;
-  origin?: Point;
+  org?: Point;
   sourceNode?: Node;
   connector?: Connector;
   ctr: HTMLElement;
 
-  constructor(public svg: SVGSVGElement, public nodes: Node[]) {
+  constructor(public svg: SVGSVGElement, public nodes: Node[], public sd: StaticData) {
     this.ctr = this.svg.parentElement!;
   }
 
@@ -18,12 +18,13 @@ export default class ConnectorBuilder {
   }
 
   source_md(e: MouseEvent, node: Node) {
-    if (e.buttons === 1 && !this.origin) {
-      this.origin = { X: node.left + node.source.getBBox().x + 6, Y: node.top + node.source.getBBox().y + 6 };
+    if (e.buttons === 1) {
+      let org = { X: node.left + node.source.getBBox().x + 6, Y: node.top + node.source.getBBox().y + 6 };
+      this.org = { X: e.clientX, Y: e.clientY };
       this.sourceNode = node;
       this.sourceNode.pointer = ConnHelper.createPointer();
       this.nodes[0].group.before(this.sourceNode.pointer!);
-      this.ctr.onmousemove = (event: MouseEvent) => this.source_mm(event);
+      this.ctr.onmousemove = (event: MouseEvent) => this.source_mm(event, org);
       this.ctr.onmouseup = () => this.source_mu();
       this.nodes.forEach(n => {
         n.box.setAttribute('class', 'connectable');
@@ -34,26 +35,22 @@ export default class ConnectorBuilder {
     }
   }
 
-  source_mm(e: MouseEvent) {
-    if (this.origin) {
-      if(e.buttons !== 1) return this.source_mu();
-      this.sourceNode!.pointer!.setAttribute('d', ConnHelper.pointerInfo(this.origin, { X: e.offsetX, Y: e.offsetY }).path);
-    }
+  source_mm(e: MouseEvent, org: Point) {
+    if (e.buttons !== 1) return this.source_mu();
+    let dest = Util.mousePoint(this.org!, e, this.sd.scale, org);
+    this.sourceNode!.pointer!.setAttribute('d', ConnHelper.pointerInfo(org, dest).path);
   }
 
   source_mu() {
-    if (this.origin) {
-      this.sourceNode!.pointer!.remove();
-      this.ctr.onmousemove = null;
-      this.ctr.onmouseup = null;
-      this.origin = undefined;
-      this.sourceNode = undefined;
-      this.nodes.forEach(n => {
-        n.box.setAttribute('class', 'grabbable');
-        n.box.onmouseup = null;
-        n.box.after(n.label);
-      });
-    }
+    this.sourceNode!.pointer!.remove();
+    this.ctr.onmousemove = null;
+    this.ctr.onmouseup = null;
+    this.sourceNode = undefined;
+    this.nodes.forEach(n => {
+      n.box.setAttribute('class', 'grabbable');
+      n.box.onmouseup = null;
+      n.box.after(n.label);
+    });
   }
 
   connect(node: Node, connData?: ConnectorData) {
@@ -138,42 +135,42 @@ export default class ConnectorBuilder {
   label_c(e: MouseEvent, node: Node, conn: Connector) {
     this.unselect();
     if (!conn.self) {
-      this.createHorizonDisc(node, conn);
-      this.createHorizonDisc(conn.nextNode, conn.pairConn!);
+      this.addHrzDisc(node, conn);
+      this.addHrzDisc(conn.nextNode, conn.pairConn!);
     }
     this.select(conn, true);
     e.stopPropagation();
   }
 
   label_md(e: MouseEvent, node: Node, connector: Connector) {
-    if (e.buttons === 1 && !this.origin) {
-      this.origin = { X: e.offsetX, Y: e.offsetY };
+    if (e.buttons === 1) {
+      this.org = { X: e.clientX, Y: e.clientY };
+      let org = { X: e.clientX, Y: e.clientY };
       this.sourceNode = node;
       this.connector = connector;
-      this.ctr.onmousemove = (event: MouseEvent) => this.label_mm(event);
-      this.ctr.onmouseup = (event: MouseEvent) => this.label_mu(event);
+      this.ctr.onmousemove = (event: MouseEvent) => this.label_mm(event, org);
+      this.ctr.onmouseup = (event: MouseEvent) => this.label_mu(event, org);
       e.stopPropagation();
     }
   }
 
-  label_mm(e: MouseEvent) {
-    if (this.origin) {
-      if(e.buttons !== 1) return this.label_mu(e);
-      let tran = `translate(${e.offsetX - this.origin.X},${e.offsetY - this.origin.Y})`;
-      let { group, path, arrow, horizon } = this.connector!;
-      let _horizon = this.connector!.pairConn?.horizon;
-      let color = Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40 ? 'red' : 'green';
-      group.setAttribute('transform', tran);
-      horizon?.elem?.setAttribute('transform', tran);
-      _horizon?.elem?.setAttribute('transform', tran);
-      path.setAttribute('stroke', color);
-      arrow?.setAttribute('fill', color);
-    }
+  label_mm(e: MouseEvent, org: Point) {
+    if (e.buttons !== 1) return this.label_mu(e, org);
+    let dest = Util.mousePoint(this.org!, e, this.sd.scale);
+    let tran = `translate(${dest.X},${dest.Y})`;
+    let { group, path, arrow, horizon } = this.connector!;
+    let _horizon = this.connector!.pairConn?.horizon;
+    let color = Math.abs(e.clientX - org.X) + Math.abs(e.clientY - org.Y) > 40 ? 'red' : 'green';
+    group.setAttribute('transform', tran);
+    horizon?.elem?.setAttribute('transform', tran);
+    _horizon?.elem?.setAttribute('transform', tran);
+    path.setAttribute('stroke', color);
+    arrow?.setAttribute('fill', color);
   }
 
-  label_mu(e: MouseEvent) {
-    if (this.origin && this.connector) {
-      if (Math.abs(e.offsetX - this.origin.X) + Math.abs(e.offsetY - this.origin.Y) > 40) {
+  label_mu(e: MouseEvent, org: Point) {
+    if (this.connector) {
+      if (Math.abs(e.clientX - org.X) + Math.abs(e.clientY - org.Y) > 40) {
         let index1 = this.sourceNode!.connectors.findIndex(c => c.id === this.connector!.id)!;
         this.sourceNode!.connectors.splice(index1, 1);
         this.delete(this.connector!);
@@ -181,14 +178,13 @@ export default class ConnectorBuilder {
       else this.connector.group.removeAttribute('transform');
       this.ctr.onmousemove = null;
       this.ctr.onmouseup = null;
-      this.origin = undefined;
       this.sourceNode = undefined;
       this.connector = undefined;
     }
   }
 
-  createHorizonDisc(node: Node, conn: Connector) {
-    let disc = ConnHelper.createHorizonDisc(conn.horizon!.point!);
+  addHrzDisc(node: Node, conn: Connector) {
+    let disc = ConnHelper.createHrzDisc(conn.horizon!.point!);
     conn.horizon!.elem = disc;
     this.svg.append(disc);
     disc.onmousedown = (event: MouseEvent) => this.disc_md(event, node, conn);
@@ -222,6 +218,7 @@ export default class ConnectorBuilder {
   disc_md(e: MouseEvent, node: Node, connector: Connector) {
     if (e.buttons === 1) {
       this.connector = connector;
+      this.org = { X: e.clientX, Y: e.clientY };
       this.ctr.onmousemove = (event: MouseEvent) => this.disc_mm(event, node);
       this.ctr.onmouseup = (event: MouseEvent) => this.disc_mu(node);
       e.stopPropagation();
@@ -231,10 +228,11 @@ export default class ConnectorBuilder {
   disc_mm(e: MouseEvent, node: Node) {
     if (e.buttons !== 1) return this.disc_mu(node);
     let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
-    hPoint1.X = e.offsetX, hPoint1.Y = e.offsetY;
+    let dest = Util.mousePoint(this.org!, e, this.sd.scale);
+    hPoint1.X += dest.X, hPoint1.Y += dest.Y;
     node.setPoint(this.connector!, hPoint1);
-    horizon!.elem!.setAttribute("x", e.offsetX.toString());
-    horizon!.elem!.setAttribute("y", e.offsetY.toString());
+    horizon!.elem!.setAttribute("x", (hPoint1.X - 4).toString());
+    horizon!.elem!.setAttribute("y", (hPoint1.Y - 4).toString());
     let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
     lbl?.g.setAttribute('transform', `translate(${lblPoint.X - lbl.size.X / 2},${lblPoint.Y - lbl.size.Y / 2})`);
     let pathD: string = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
@@ -243,6 +241,7 @@ export default class ConnectorBuilder {
       let phi = Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
       this.connector!.arrow!.setAttribute('transform', `translate(${p1.X},${p1.Y}) rotate(${phi * 180 / Math.PI})`);
     }
+    this.org = { X: e.clientX, Y: e.clientY };
   }
 
   disc_mu(node: Node) {
@@ -287,8 +286,8 @@ export default class ConnectorBuilder {
         let h1 = conn.horizon!, hPoint1 = h1.point!;
         let h2 = conn.pairConn!.horizon!, hPoint2 = h2.point!;
         node.updatePoints(p1, h1, p2, h2);
-        h1.elem?.setAttribute("x", hPoint1.X.toString());
-        h1.elem?.setAttribute("y", hPoint1.Y.toString());
+        h1.elem?.setAttribute("x", (hPoint1.X - 4).toString());
+        h1.elem?.setAttribute("y", (hPoint1.Y - 4).toString());
         pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
         let phi = conn.toDest ? Math.atan2(p2.Y - hPoint2.Y, p2.X - hPoint2.X) : Math.atan2(p1.Y - hPoint1.Y, p1.X - hPoint1.X);
         let dest = conn.toDest ? p2 : p1;

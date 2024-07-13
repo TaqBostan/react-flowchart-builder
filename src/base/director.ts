@@ -11,11 +11,11 @@ export default class Director {
   builders: NodeBuilder<Node>[];
   connBuilder: ConnectorBuilder;
   nodes: Node[] = [];
-  origin?: Point;
+  org?: Point;
 
   constructor(public svg: SVGSVGElement) {
     let parent = svg.parentElement!;
-    this.connBuilder = new ConnectorBuilder(svg, this.nodes);
+    this.connBuilder = new ConnectorBuilder(svg, this.nodes, Director.sd);
     this.builders = [new RectBuilder(svg, this.connBuilder, Director.sd), new CircleBuilder(svg, this.connBuilder, Director.sd), new RhomBuilder(svg, this.connBuilder, Director.sd)];
     parent.onmousedown = (event: MouseEvent) => this.drag_md(event);
     parent.onclick = () => this.parent_c();
@@ -64,29 +64,26 @@ export default class Director {
   }
 
   drag_md(e: MouseEvent) {
-    if (e.buttons === 1 && !this.origin) {
+    if (e.buttons === 1) {
       let parent = this.svg.parentElement!;
-      this.origin = { X: e.clientX, Y: e.clientY };
+      this.org = { X: e.clientX, Y: e.clientY };
       parent.onmousemove = (event: MouseEvent) => this.drag_mm(event);
       parent.onmouseup = () => this.drag_mu();
     }
   }
 
   drag_mm(e: MouseEvent) {
-    if (this.origin) {
-      if(e.buttons !== 1) return this.drag_mu();
-      this.svg.style.left = (parseFloat(this.svg.style.left) + (e.clientX - this.origin.X)) + 'px';
-      this.svg.style.top = (parseFloat(this.svg.style.top) + (e.clientY - this.origin.Y)) + 'px';
-      this.origin = { X: e.clientX, Y: e.clientY };
+    if (this.org) {
+      if (e.buttons !== 1) return this.drag_mu();
+      this.svg.style.left = (parseFloat(this.svg.style.left) + (e.clientX - this.org.X)) + 'px';
+      this.svg.style.top = (parseFloat(this.svg.style.top) + (e.clientY - this.org.Y)) + 'px';
+      this.org = { X: e.clientX, Y: e.clientY };
     }
   }
 
   drag_mu() {
-    if (this.origin) {
-      this.svg.parentElement!.onmousemove = null;
-      this.svg.parentElement!.onmouseup = null;
-      this.origin = undefined;
-    }
+    this.svg.parentElement!.onmousemove = null;
+    this.svg.parentElement!.onmouseup = null;
   }
 
   addNodes(nodes: Node[]) {

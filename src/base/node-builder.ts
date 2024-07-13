@@ -5,7 +5,7 @@ import Util from './util';
 
 export default abstract class NodeBuilder<N extends Node> {
   static maxId: number = 0;
-  origin?: Point;
+  org?: Point;
   node?: Node;
   nodes: Node[];
   ctr: HTMLElement;
@@ -108,8 +108,8 @@ export default abstract class NodeBuilder<N extends Node> {
   }
 
   node_md(e: MouseEvent, node: Node) {
-    if (e.buttons === 1 && !this.origin) {
-      this.origin = { X: e.clientX, Y: e.clientY };
+    if (e.buttons === 1) {
+      this.org = { X: e.clientX, Y: e.clientY };
       this.node = node;
       this.ctr.onmousemove = (event: MouseEvent) => this.node_mm(event);
       node.group.onmouseup = () => this.node_mu();
@@ -118,9 +118,10 @@ export default abstract class NodeBuilder<N extends Node> {
   }
 
   node_mm(e: MouseEvent) {
-    if (this.origin && this.node) {
-      if(e.buttons !== 1) return this.node_mu();
-      this.node.move(this.node.left + (e.clientX - this.origin.X) / this.sd.scale, this.node.top + (e.clientY - this.origin.Y) / this.sd.scale);
+    if (this.node) {
+      if (e.buttons !== 1) return this.node_mu();
+      let dest = Util.mousePoint(this.org!, e, this.sd.scale);
+      this.node.move(this.node.left + dest.X, this.node.top + dest.Y);
       this.node.connectors.forEach(connector => {
         connector.side = this.node!.connSide(connector.nextNode);
         if (!connector.self) {
@@ -132,16 +133,13 @@ export default abstract class NodeBuilder<N extends Node> {
       });
       this.node.arrangeSides();
       this.connBuilder.updateAllConn(this.node);
-      this.origin = { X: e.clientX, Y: e.clientY };
+      this.org = { X: e.clientX, Y: e.clientY };
     }
   }
 
   node_mu() {
-    if (this.origin) {
-      this.ctr.onmousemove = null;
-      this.node!.group.onmouseup = null;
-      this.origin = undefined;
-      this.node = undefined;
-    }
+    this.ctr.onmousemove = null;
+    this.node!.group.onmouseup = null;
+    this.node = undefined;
   }
 }
