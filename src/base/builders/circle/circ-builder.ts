@@ -20,29 +20,29 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
 
   setHorizon = function (this: CircleNode, conn: Connector, origin: Point, dest: Point): void {
     if (conn.horizon?.point !== undefined) return;
-    let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)), center = this.center(),
+    let distance = Math.sqrt(Math.pow(dest.X - origin.X, 2) + Math.pow(dest.Y - origin.Y, 2)) * this.ratio.h, center = this.center(),
       vector = [origin.X - center.X, origin.Y - center.Y];
-    let point = { X: origin.X + vector[0] * distance / this.radius / 3, Y: origin.Y + vector[1] * distance / this.radius / 3 };
+    let point = { X: origin.X + vector[0] * distance / this.radius, Y: origin.Y + vector[1] * distance / this.radius };
     conn.horizon = { point, ratioH: 0, ratioV: 0 };
   }
 
-  updatePoints = function (this: CircleNode, p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) {
-    let center = this.center(), hPoint = hrz.point!, hPoint2 = hrz2.point!, phi: number, sign = p2.X < p.X ? 1 : -1;
+  updatePoints = function (this: CircleNode, p1: Point, hrz: Horizon, c2: Point, hrz2: Horizon) {
+    let c1 = this.center(), hPoint = hrz.point!, hPoint2 = hrz2.point!, phi: number, sign = c2.X < p1.X ? 1 : -1;
     if (hrz.ratioH === 0) {
       hrz.ratioH = this.ratio.h;
-      let v1 = [p2.X - center.X, p2.Y - center.Y], v2 = [hPoint2.X - center.X, hPoint2.Y - center.Y], v1v2 = v1[0] * v2[1] - v1[1] * v2[0];
+      let v1 = [c2.X - c1.X, c2.Y - c1.Y], v2 = [hPoint2.X - c1.X, hPoint2.Y - c1.Y], v1v2 = v1[0] * v2[1] - v1[1] * v2[0];
       let l1 = Util.len(v1), l2 = Util.len(v2);
       phi = l1 > 0 && l2 > 0 ? sign * Math.asin(v1v2 / l1 / l2) : 0;
       hrz.ratioV = hrz.ratioH * Math.tan(phi);
     }
     else phi = sign * Math.atan2(hrz.ratioV, hrz.ratioH);
-    phi += Math.atan2(p2.Y - center.Y, p2.X - center.X);
-    p.X = center.X + this.radius * Math.cos(phi);
-    p.Y = center.Y + this.radius * Math.sin(phi);
-    let horizontal = [p2.X - p.X, p2.Y - p.Y],
+    phi += Math.atan2(c2.Y - c1.Y, c2.X - c1.X);
+    p1.X = c1.X + this.radius * Math.cos(phi);
+    p1.Y = c1.Y + this.radius * Math.sin(phi);
+    let horizontal = [c2.X - p1.X, c2.Y - p1.Y],
       vertical = [-sign * horizontal[1], sign * horizontal[0]]
-    hPoint.X = p.X + horizontal[0] * hrz.ratioH + vertical[0] * hrz.ratioV;
-    hPoint.Y = p.Y + horizontal[1] * hrz.ratioH + vertical[1] * hrz.ratioV;
+    hPoint.X = p1.X + horizontal[0] * hrz.ratioH + vertical[0] * hrz.ratioV;
+    hPoint.Y = p1.Y + horizontal[1] * hrz.ratioH + vertical[1] * hrz.ratioV;
   }
 
   arrangeSide = function (this: CircleNode, side: CircleSide) {
@@ -72,7 +72,7 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
   }
 
   setRatio = function (this: CircleNode, conn: Connector) {
-    let origin = conn.point!, dest = conn.pairConn!.point!, hrzP = conn.horizon!.point!, sign = dest.X < origin.X ? 1 : -1;
+    let origin = conn.point!, dest = conn.nextNode.center(), hrzP = conn.horizon!.point!, sign = dest.X < origin.X ? 1 : -1;
     let horizontal = [dest.X - origin.X, dest.Y - origin.Y], vertical = [-sign * horizontal[1], sign * horizontal[0]];
     let deltaHrzX = hrzP.X - origin.X, deltaHrzY = hrzP.Y - origin.Y;
     conn.horizon!.ratioV = (horizontal[1] * deltaHrzX - horizontal[0] * deltaHrzY) / (vertical[0] * horizontal[1] - vertical[1] * horizontal[0]);

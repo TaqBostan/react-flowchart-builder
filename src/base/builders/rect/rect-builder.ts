@@ -65,7 +65,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   }
 
   setRatio = function (this: RectNode, conn: Connector) {
-    let origin = conn.point!, dest = conn.pairConn!.point!, hrzP = conn.horizon!.point!, sign = dest.X > origin.X ? 1 : -1;
+    let origin = conn.point!, dest = conn.nextNode.center(), hrzP = conn.horizon!.point!, sign = dest.X > origin.X ? 1 : -1;
     let deltaHrzX = hrzP.X - origin.X, deltaHrzY = hrzP.Y - origin.Y, deltaDestX = dest.X - origin.X, deltaDestY = dest.Y - origin.Y;
     conn.horizon!.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / (deltaHrzX * deltaDestX + deltaHrzY * deltaDestY)
     conn.horizon!.ratioH = deltaHrzX / (deltaDestX + sign * deltaDestY * conn.horizon!.ratioV);

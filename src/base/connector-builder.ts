@@ -272,6 +272,7 @@ export default class ConnectorBuilder {
   }
 
   updateConn(node: Node, side: Side) {
+    let c1 = node.center();
     node.connectors.filter(c => c.side.equal(side)).forEach(conn => {
       let p1 = conn.point!;
       let pathD: string, labelPoint: Point;
@@ -280,12 +281,12 @@ export default class ConnectorBuilder {
         labelPoint = { X: p1.X, Y: p1.Y - 43 };
       }
       else {
-        let p2 = conn.pairConn!.point!
-        node.setHorizon(conn, p1, p2);
-        conn.nextNode.setHorizon(conn.pairConn!, p2, p1);
+        let p2 = conn.pairConn!.point!, c2 = conn.nextNode.center();
+        node.setHorizon(conn, p1, c2);
+        conn.nextNode.setHorizon(conn.pairConn!, p2, c1);
         let h1 = conn.horizon!, hPoint1 = h1.point!;
         let h2 = conn.pairConn!.horizon!, hPoint2 = h2.point!;
-        node.updatePoints(p1, h1, p2, h2);
+        node.updatePoints(p1, h1, c2, h2);
         h1.elem?.setAttribute("x", (hPoint1.X - 4).toString());
         h1.elem?.setAttribute("y", (hPoint1.Y - 4).toString());
         pathD = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);

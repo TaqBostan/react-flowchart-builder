@@ -21,7 +21,7 @@ export abstract class Node {
 
   setHorizon(conn: Connector, origin: Point, dest: Point) { }
 
-  updatePoints(p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) { }
+  updatePoints(p: Point, hrz: Horizon, c2: Point, hrz2: Horizon) { }
 
   arrangeSide(side: Side) { }
 
