@@ -1,5 +1,6 @@
 import NodeBuilder from "../../node-builder";
 import { Connector, Horizon, Point, Side, Node } from "../../types";
+import Util from "../../util";
 import { RectNode, RectSide } from "./rect-node";
 
 
@@ -18,13 +19,10 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   }
 
   setHorizon = function (this: RectNode, conn: Connector, p1: Point, c2: Point) {
-    if (conn.horizon === undefined) conn.horizon = { ratioH: this.ratio.h, ratioV: this.ratio.v };
     if (conn.horizon.point === undefined) conn.horizon.point = { X: 0, Y: 0 };
-    let c1 = this.center(), horizontal = [(c2.X - c1.X) * conn.horizon.ratioH, (c2.Y - c1.Y) * conn.horizon.ratioH],
-      sign = c2.X > c1.X ? 1 : -1,
-      vertical = [sign * horizontal[1] * conn.horizon.ratioV, -sign * horizontal[0] * conn.horizon.ratioV];
-    conn.horizon.point!.X = p1.X + horizontal[0] + vertical[0];
-    conn.horizon.point!.Y = p1.Y + horizontal[1] + vertical[1];
+    let c1 = this.center(), horizontal = [c2.X - c1.X, c2.Y - c1.Y], sign = c2.X > c1.X ? 1 : -1;
+    conn.horizon.point!.X = p1.X + horizontal[0] * conn.horizon.ratioH + sign * horizontal[1] * conn.horizon.ratioV;
+    conn.horizon.point!.Y = p1.Y + horizontal[1] * conn.horizon.ratioH - sign * horizontal[0] * conn.horizon.ratioV;
   }
 
   updatePoints = function (this: RectNode, p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) { }
@@ -50,9 +48,11 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     });
   }
 
-  connSide = function (this: RectNode, node2: Node, builder: RectBuilder): RectSide {
+  connSide = function (this: RectNode, hrz: Horizon, node2: Node, builder: RectBuilder): RectSide {
     if (this.id === node2.id) return new RectSide(true, true);
-    else return builder.getSide(this.center(), this.height, this.width, node2.center());
+    let c1 = this.center(), c2 = node2.center(), sign = (c2.X - c1.X) > 0 ? 1 : -1;
+    c2 = Util.rotate(c2, c1, - sign * Math.atan2(hrz.ratioV, hrz.ratioH));
+    return builder.getSide(this.center(), this.height, this.width, c2);
   }
 
   setPoint = function (this: RectNode, conn: Connector, hrzP: Point, builder: RectBuilder) {
@@ -60,15 +60,16 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     let side = conn.side = builder.getSide(center, this.height, this.width, hrzP), sign = side.firstSide ? -1 : 1;
     let ConnP = conn.point! = this.sideCenter(side);
     let phi = Math.atan2(hrzP.Y - center.Y, hrzP.X - center.X);
-    if(side.vertical) ConnP.X += sign * this.height / Math.tan(phi) / 2;
+    if (side.vertical) ConnP.X += sign * this.height / Math.tan(phi) / 2;
     else ConnP.Y += sign * this.width * Math.tan(phi) / 2;
   }
 
   setRatio = function (this: RectNode, conn: Connector) {
-    let c1 = this.center(), p1 = conn.point!, c2 = conn.nextNode.center(), hrzP = conn.horizon!.point!, sign = c2.X > c1.X ? 1 : -1;
+    let c1 = this.center(), p1 = conn.point!, c2 = conn.nextNode.center(), hrzP = conn.horizon.point!, sign = c2.X > c1.X ? 1 : -1;
     let deltaHrzX = hrzP.X - p1.X, deltaHrzY = hrzP.Y - p1.Y, deltaDestX = c2.X - c1.X, deltaDestY = c2.Y - c1.Y;
-    conn.horizon!.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / (deltaHrzX * deltaDestX + deltaHrzY * deltaDestY)
-    conn.horizon!.ratioH = deltaHrzX / (deltaDestX + sign * deltaDestY * conn.horizon!.ratioV);
+    let denominator = deltaDestX * deltaDestX + deltaDestY * deltaDestY;
+    conn.horizon.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / denominator;
+    conn.horizon.ratioH = (deltaHrzX * deltaDestX + deltaHrzY * deltaDestY) / denominator;
   }
 
   setSize(n: RectNode): void {

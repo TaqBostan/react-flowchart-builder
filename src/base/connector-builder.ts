@@ -1,5 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side, ConnectorData, ns, StaticData } from './types';
+import { Connector, Node, Point, Side, ConnectorData, ns, StaticData, Horizon } from './types';
 import Util from './util';
 export default class ConnectorBuilder {
   static editable: boolean;
@@ -58,7 +58,8 @@ export default class ConnectorBuilder {
       let originNode = this.sourceNode, type = (connData?.type) ? connData.type : "solid";
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
-      let sideOrigin = originNode.connSide(node);
+      let originHorizon: Horizon = { ratioH: originNode.ratio.h, ratioV: originNode.ratio.v };
+      let sideOrigin = originNode.connSide(originHorizon, node);
       let group = document.createElementNS(ns, 'g') as SVGGElement;
       let path = ConnHelper.createConnector(type);
       let arrow = !self ? ConnHelper.createArrow(type) : undefined;
@@ -73,6 +74,7 @@ export default class ConnectorBuilder {
         label: connLabel,
         arrow,
         nextNode: node,
+        horizon: originHorizon,
         slope: 0,
         side: sideOrigin,
         self,
@@ -85,8 +87,9 @@ export default class ConnectorBuilder {
       if (ConnectorBuilder.editable) this.labelEvent(originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
-        let side = node.connSide(originNode);
-        let conn = { ...originConn, nextNode: originNode, side, toDest: !originConn.toDest, point: undefined, pairConn: originConn };
+        let horizon: Horizon = { ratioH: node.ratio.h, ratioV: node.ratio.v };
+        let side = node.connSide(horizon, originNode);
+        let conn = { ...originConn, nextNode: originNode, horizon, side, toDest: false, point: undefined, pairConn: originConn };
         originConn.pairConn = conn;
         if (connData?.ratioD) conn.horizon = { ratioH: connData.ratioD[0], ratioV: connData.ratioD[1] }
         node.connectors.push(conn);
@@ -162,7 +165,7 @@ export default class ConnectorBuilder {
     let _horizon = this.connector!.pairConn?.horizon;
     let color = Math.abs(e.clientX - org.X) + Math.abs(e.clientY - org.Y) > 40 ? 'red' : 'green';
     group.setAttribute('transform', tran);
-    horizon?.elem?.setAttribute('transform', tran);
+    horizon.elem?.setAttribute('transform', tran);
     _horizon?.elem?.setAttribute('transform', tran);
     path.setAttribute('stroke', color);
     arrow?.setAttribute('fill', color);
@@ -184,8 +187,8 @@ export default class ConnectorBuilder {
   }
 
   addHrzDisc(node: Node, conn: Connector) {
-    let disc = ConnHelper.createHrzDisc(conn.horizon!.point!);
-    conn.horizon!.elem = disc;
+    let disc = ConnHelper.createHrzDisc(conn.horizon.point!);
+    conn.horizon.elem = disc;
     this.svg.append(disc);
     disc.onmousedown = (event: MouseEvent) => this.disc_md(event, node, conn);
     disc.onclick = (event: MouseEvent) => event.stopPropagation();
@@ -207,10 +210,10 @@ export default class ConnectorBuilder {
         this.select(conn, false);
         if (!conn.self) {
           let _conn = conn.pairConn!;
-          _conn.horizon!.elem!.remove();
-          _conn.horizon!.elem = undefined;
-          conn.horizon!.elem!.remove();
-          conn.horizon!.elem = undefined;
+          _conn.horizon.elem!.remove();
+          _conn.horizon.elem = undefined;
+          conn.horizon.elem!.remove();
+          conn.horizon.elem = undefined;
         }
       });
   }
@@ -227,12 +230,12 @@ export default class ConnectorBuilder {
 
   disc_mm(e: MouseEvent, node: Node) {
     if (e.buttons !== 1) return this.disc_mu(node);
-    let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon!.point!, hPoint2 = pairConn!.horizon!.point!;
+    let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon.point!, hPoint2 = pairConn!.horizon.point!;
     let dest = Util.mousePoint(this.org!, e, this.sd.scale);
     hPoint1.X += dest.X, hPoint1.Y += dest.Y;
     node.setPoint(this.connector!, hPoint1);
-    horizon!.elem!.setAttribute("x", (hPoint1.X - 4).toString());
-    horizon!.elem!.setAttribute("y", (hPoint1.Y - 4).toString());
+    horizon.elem!.setAttribute("x", (hPoint1.X - 4).toString());
+    horizon.elem!.setAttribute("y", (hPoint1.Y - 4).toString());
     let lblPoint = ConnHelper.labelPos(p1, p2, hPoint1, hPoint2);
     lbl?.g.setAttribute('transform', `translate(${lblPoint.X - lbl.size.X / 2},${lblPoint.Y - lbl.size.Y / 2})`);
     let pathD: string = ConnHelper.connInfo(p1, p2, hPoint1, hPoint2);
@@ -247,8 +250,7 @@ export default class ConnectorBuilder {
   disc_mu(node: Node) {
     if (this.connector) {
       node.setRatio(this.connector!);
-      //this.connector.side = node.connSide(this.connector.nextNode);
-      //node.arrangeSides();
+      node.arrangeSides();
       this.updateAllConn(node);
       this.ctr.onmousemove = null;
       this.ctr.onmouseup = null;
@@ -263,8 +265,8 @@ export default class ConnectorBuilder {
       conn.nextNode.connectors.splice(index2, 1);
     }
     conn.group.remove();
-    conn.horizon?.elem?.remove();
-    conn.pairConn?.horizon?.elem?.remove();
+    conn.horizon.elem?.remove();
+    conn.pairConn?.horizon.elem?.remove();
   }
 
   updateAllConn(node: Node) {
@@ -284,8 +286,8 @@ export default class ConnectorBuilder {
         let p2 = conn.pairConn!.point!, c2 = conn.nextNode.center();
         node.setHorizon(conn, p1, c2);
         conn.nextNode.setHorizon(conn.pairConn!, p2, c1);
-        let h1 = conn.horizon!, hPoint1 = h1.point!;
-        let h2 = conn.pairConn!.horizon!, hPoint2 = h2.point!;
+        let h1 = conn.horizon, hPoint1 = h1.point!;
+        let h2 = conn.pairConn!.horizon, hPoint2 = h2.point!;
         node.updatePoints(p1, h1, c2, h2);
         h1.elem?.setAttribute("x", (hPoint1.X - 4).toString());
         h1.elem?.setAttribute("y", (hPoint1.Y - 4).toString());

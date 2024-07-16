@@ -25,7 +25,7 @@ export abstract class Node {
 
   arrangeSide(side: Side) { }
 
-  connSide(node2: Node): Side { throw Error(); }
+  connSide(hrz: Horizon, node2: Node): Side { throw Error(); }
 
   setPoint(conn: Connector, hrzP: Point): void { throw Error(); }
 
@@ -64,7 +64,7 @@ export type Connector = {
   arrow?: SVGPathElement,
   nextNode: Node,
   point?: Point,
-  horizon?: Horizon,
+  horizon: Horizon,
   slope: number,
   side: Side,
   self: boolean,

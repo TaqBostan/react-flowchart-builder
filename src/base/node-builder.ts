@@ -123,12 +123,11 @@ export default abstract class NodeBuilder<N extends Node> {
       let dest = Util.mousePoint(this.org!, e, this.sd.scale);
       this.node.move(this.node.left + dest.X, this.node.top + dest.Y);
       this.node.connectors.forEach(connector => {
-        connector.side = this.node!.connSide(connector.nextNode);
+        connector.side = this.node!.connSide(connector.horizon, connector.nextNode);
         if (!connector.self) {
-          let side2 = connector.nextNode.connSide(this.node!);
-          connector.pairConn!.side = side2;
-          connector.nextNode.arrangeSide(side2);
-          this.connBuilder.updateConn(connector.nextNode, side2);
+          let conn2 = connector.pairConn!, node2 = connector.nextNode, side2 = conn2.side = node2.connSide(conn2.horizon, this.node!);
+          node2.arrangeSide(side2);
+          this.connBuilder.updateConn(node2, side2);
         }
       });
       this.node.arrangeSides();

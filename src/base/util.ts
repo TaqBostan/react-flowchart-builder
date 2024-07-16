@@ -22,4 +22,9 @@ export default class Util {
   {
     return { X: (p2.clientX - p1.X) / scale + (shift?.X || 0), Y: (p2.clientY - p1.Y) / scale + (shift?.Y || 0) }
   }
+
+  static rotate = (pos: Point, center: Point, teta: number): Point => {
+    let dx = pos.X - center.X, dy = pos.Y - center.Y;
+    return {X: dx * Math.cos(teta) - dy * Math.sin(teta) + center.X, Y: dx * Math.sin(teta) + dy * Math.cos(teta) + center.Y};
+  }
 }
