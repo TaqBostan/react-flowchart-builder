@@ -17,14 +17,14 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     RectNode.prototype.setRatio = function (...params) { builder.setRatio.apply(this, params) };
   }
 
-  setHorizon = function (this: RectNode, conn: Connector, origin: Point, dest: Point) {
+  setHorizon = function (this: RectNode, conn: Connector, p1: Point, c2: Point) {
     if (conn.horizon === undefined) conn.horizon = { ratioH: this.ratio.h, ratioV: this.ratio.v };
     if (conn.horizon.point === undefined) conn.horizon.point = { X: 0, Y: 0 };
-    let horizontal = [(dest.X - origin.X) * conn.horizon.ratioH, (dest.Y - origin.Y) * conn.horizon.ratioH],
-      sign = dest.X > origin.X ? 1 : -1,
+    let c1 = this.center(), horizontal = [(c2.X - c1.X) * conn.horizon.ratioH, (c2.Y - c1.Y) * conn.horizon.ratioH],
+      sign = c2.X > c1.X ? 1 : -1,
       vertical = [sign * horizontal[1] * conn.horizon.ratioV, -sign * horizontal[0] * conn.horizon.ratioV];
-    conn.horizon.point!.X = origin.X + horizontal[0] + vertical[0];
-    conn.horizon.point!.Y = origin.Y + horizontal[1] + vertical[1];
+    conn.horizon.point!.X = p1.X + horizontal[0] + vertical[0];
+    conn.horizon.point!.Y = p1.Y + horizontal[1] + vertical[1];
   }
 
   updatePoints = function (this: RectNode, p: Point, hrz: Horizon, p2: Point, hrz2: Horizon) { }
@@ -65,8 +65,8 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   }
 
   setRatio = function (this: RectNode, conn: Connector) {
-    let origin = conn.point!, dest = conn.nextNode.center(), hrzP = conn.horizon!.point!, sign = dest.X > origin.X ? 1 : -1;
-    let deltaHrzX = hrzP.X - origin.X, deltaHrzY = hrzP.Y - origin.Y, deltaDestX = dest.X - origin.X, deltaDestY = dest.Y - origin.Y;
+    let c1 = this.center(), p1 = conn.point!, c2 = conn.nextNode.center(), hrzP = conn.horizon!.point!, sign = c2.X > c1.X ? 1 : -1;
+    let deltaHrzX = hrzP.X - p1.X, deltaHrzY = hrzP.Y - p1.Y, deltaDestX = c2.X - c1.X, deltaDestY = c2.Y - c1.Y;
     conn.horizon!.ratioV = sign * (deltaHrzX * deltaDestY - deltaHrzY * deltaDestX) / (deltaHrzX * deltaDestX + deltaHrzY * deltaDestY)
     conn.horizon!.ratioH = deltaHrzX / (deltaDestX + sign * deltaDestY * conn.horizon!.ratioV);
   }
