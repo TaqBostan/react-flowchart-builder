@@ -67,6 +67,7 @@ export type Connector = {
   horizon: Horizon,
   slope: number,
   side: Side,
+  fixSide?: Side,
   self: boolean,
   toDest: boolean,
   type: string,
@@ -74,7 +75,7 @@ export type Connector = {
   pairConn?: Connector
 }
 
-export type ConnectorData = { id?: number, from: number, to: number, text?: string, type?: string, ratioS?: number[], ratioD?: number[] }
+export type ConnectorData = { id?: number, from: number, to: number, text?: string, type?: string, ratioS?: number[], ratioD?: number[], sideS?: Side, sideD?: Side }
 
 export type Point = { X: number, Y: number }
 

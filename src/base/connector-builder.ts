@@ -59,7 +59,8 @@ export default class ConnectorBuilder {
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let originHorizon: Horizon = { ratioH: originNode.ratio.h, ratioV: originNode.ratio.v };
-      let sideOrigin = originNode.connSide(originHorizon, node);
+      if (connData?.ratioS) originHorizon = { ratioH: connData.ratioS[0], ratioV: connData.ratioS[1] }
+      let sideOrigin = connData?.sideS || originNode.connSide(originHorizon, node);
       let group = document.createElementNS(ns, 'g') as SVGGElement;
       let path = ConnHelper.createConnector(type);
       let arrow = !self ? ConnHelper.createArrow(type) : undefined;
@@ -82,16 +83,15 @@ export default class ConnectorBuilder {
         type: type,
         selected: false
       }
-      if (connData?.ratioS) originConn.horizon = { ratioH: connData.ratioS[0], ratioV: connData.ratioS[1] }
       originNode.connectors.push(originConn);
       if (ConnectorBuilder.editable) this.labelEvent(originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let horizon: Horizon = { ratioH: node.ratio.h, ratioV: node.ratio.v };
-        let side = node.connSide(horizon, originNode);
+        if (connData?.ratioD) horizon = { ratioH: connData.ratioD[0], ratioV: connData.ratioD[1] }
+        let side = connData?.sideD ||  node.connSide(horizon, originNode);
         let conn = { ...originConn, nextNode: originNode, horizon, side, toDest: false, point: undefined, pairConn: originConn };
         originConn.pairConn = conn;
-        if (connData?.ratioD) conn.horizon = { ratioH: connData.ratioD[0], ratioV: connData.ratioD[1] }
         node.connectors.push(conn);
         node.arrangeSide(side);
         this.updateConn(node, side);

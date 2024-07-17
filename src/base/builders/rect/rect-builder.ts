@@ -52,7 +52,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     if (this.id === node2.id) return new RectSide(true, true);
     let c1 = this.center(), c2 = node2.center(), sign = (c2.X - c1.X) > 0 ? 1 : -1;
     c2 = Util.rotate(c2, c1, - sign * Math.atan2(hrz.ratioV, hrz.ratioH));
-    return builder.getSide(this.center(), this.height, this.width, c2);
+    return builder.getSide(c1, this.height, this.width, c2);
   }
 
   setPoint = function (this: RectNode, conn: Connector, hrzP: Point, builder: RectBuilder) {

@@ -75,6 +75,23 @@ The following props can be defined on `Flowchart`:
 
 (\*) required props
 
+## Handles
+You can access the handles using the `Flowchart` object as follows:
+
+```js
+<button onClick={() => { flowchart!.addRhomNode(100, 100, txt) }}>Add Rhombus Node</button>
+```
+
+Below is a list of all handles:
+| Handle | Type | Description |
+|---|---|---|
+|`addRectNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding rectangles node by dragging the left mouse button|
+|`addCircleNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding circles node by dragging the left mouse button|
+|`addRhomNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding rhombus node by dragging the left mouse button|
+|`getData`|`(): { nodes: NodeData[], connectors => ConnectorData[] }`|Gets all nodes and connectors|
+`changeConnType`|`(id: number, type: string) => void`|Changes type of connectors (solid/dashed)
+
+
 ## Node
 
 Below is the data model for nodes:
