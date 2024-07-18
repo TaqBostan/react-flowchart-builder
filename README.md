@@ -3,9 +3,10 @@ A lightweight component to design flowcharts. Check out the [demo](https://d5y3k
 ## Features
 
 - Different shapes of nodes.
-- Add/Remove links between nodes using the mouse
-- Enable/Disable adding/removing links
-- Drag nodes
+- Add/Remove/Move nodes
+- Add/Remove/Reshape links between nodes
+- Enable/Disable adding/editting/removing links
+- Zoom and Pan
 - Raw or typed input/output
 
 ![Screenshot of ImageAnnotator](https://github.com/TaqBostan/content/blob/main/flowchart.png?raw=true)
@@ -35,7 +36,15 @@ const { setHandles, flowchart } = useFlowchart();
 <Flowchart setHandles={setHandles} width='700px' height='400px' editable={true} />
 ```
 
-Clicking the button creates a new node at `x = 50, y = 50`. Drag the orange square from one node to another to add connections.
+Clicking the button creates a new node at `x = 50, y = 50`. Drag the orange square from one node to another to add links.
+
+### Mouse and Keyboard events
+
+- **click**: Edit/Stop Edit Links - Select Node/Link
+- **double click**: Edit Node/Link text
+- **mouse wheel**: Zoom
+- **mouse drag**: Pan - Move Node/Link
+- **Delete key**: Delete Node/Link
 
 ## Loading/Saving a Flowchart
 
@@ -47,14 +56,14 @@ const load = () => {
     { id: 1, text: 'node1', X: 50, Y: 50 },
     { id: 2, text: 'node2', X: 150, Y: 50 },
   ];
-  let connectors = [
+  let links = [
     { from: 1, to: 2 },
     { from: 2, to: 2 },
   ];
-  flowchart.addNodes(nodes, connectors);
+  flowchart.addNodes(nodes, links);
 }
 
-const save = () => console.log(flowchart.getData()) // { nodes: […], connectors: […] }
+const save = () => console.log(flowchart.getData()) // { nodes: […], links: […] }
 ```
 
 ```js
@@ -70,7 +79,7 @@ The following props can be defined on `Flowchart`:
 |---|---|---|---|
 | `width` \* | `string` | Flowchart width |  |
 | `height` \* | `string` | Flowchart height |  |
-| `editable` | `boolean` | Enable/Disable adding/removing connectors (links between nodes) | `false` |
+| `editable` | `boolean` | Enable/Disable adding/removing links | `false` |
 | `onReady` | `FlowchartHandles => any` | When the flowchart is mounted |   |
 
 (\*) required props
@@ -85,11 +94,12 @@ You can access the handles using the `Flowchart` object as follows:
 Below is a list of all handles:
 | Handle | Type | Description |
 |---|---|---|
-|`addRectNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding rectangles node by dragging the left mouse button|
-|`addCircleNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding circles node by dragging the left mouse button|
-|`addRhomNode`|`(left: number, top: number, text: string, id?: number, color?: string)=> number`|Allows adding rhombus node by dragging the left mouse button|
-|`getData`|`(): { nodes: NodeData[], connectors => ConnectorData[] }`|Gets all nodes and connectors|
-`changeConnType`|`(id: number, type: string) => void`|Changes type of connectors (solid/dashed)
+| `addRectNode` | `(left: number, top: number, text: string, id?: number, color?: string) => number` | Adds a rectangle node at `(left, top)`, returns its `id` |
+| `addCircleNode` |`(left: number, top: number, text: string, id?: number, color?: string) => number`| Adds a circle node at `(left, top)`, returns its `id` |
+| `addRhomNode` | `(left: number, top: number, text: string, id?: number, color?: string) => number`| Adds a rhombus node at `(left, top)`, returns its `id` |
+| `addNodes` | `(nodes: NodeData[], links?: LinkData[]) => void`| Adds multiple nodes and links (see [Loading a Flowchart](#loadingsaving-a-flowchart)) |
+| `getData` | `() => { nodes: NodeData[], links: LinkData[] }`| Gets all nodes and links (see [Saving a Flowchart](#loadingsaving-a-flowchart)) |
+| `changeLinkType` |`(id: number, type: string) => void` | Changes the type of a link (solid/dashed)
 
 
 ## Node
@@ -106,15 +116,15 @@ Below is the data model for nodes:
 
 (\*) required props
 
-## Connector
+## Link
 
-Below is the data model for connectors (links between nodes):
+Below is the data model for links:
 
 | Prop | Type | Description | Default |
 |---|---|---|---|
 | `from` \* | `number` | The `id` of the origin node |  |
 | `to` \* | `number` | The `id` of the destination node |  |
-| `text` | `string` | Connector label |  |
+| `text` | `string` | Link label |  |
 
 (\*) required props
 

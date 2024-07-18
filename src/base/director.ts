@@ -3,7 +3,7 @@ import RectBuilder from "./builders/rect/rect-builder";
 import RhomBuilder from "./builders/rhom/rhom-builder";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
-import { Connector, ConnectorData, Node, Point } from "./types";
+import { Connector, LinkData, Node, Point } from "./types";
 
 export default class Director {
   static instance: Director;
@@ -54,7 +54,7 @@ export default class Director {
 
   mousewheel(e: WheelEvent) {
     let { clientWidth: w, clientHeight: h, offsetLeft, offsetTop } = (e.currentTarget as HTMLElement)
-    let scale = e.deltaY > 0 ? 1.25 : 0.8;
+    let scale = e.deltaY > 0 ? 0.8 : 1.25;
     let left = parseFloat(this.svg.style.left), top = parseFloat(this.svg.style.top);
     this.svg.style.left = (left + (scale - 1) * (w / 2 + left - (e.pageX - offsetLeft))) + 'px';
     this.svg.style.top = (top + (scale - 1) * (h / 2 + top - (e.pageY - offsetTop))) + 'px';
@@ -90,7 +90,7 @@ export default class Director {
     nodes.forEach(node => this.addNode(node));
   }
 
-  addConns(conns: ConnectorData[] = []) {
+  addConns(conns: LinkData[] = []) {
     conns.forEach(connector => {
       let origin = this.nodes.find(n => n.id === connector.from), destination = this.nodes.find(n => n.id === connector.to);
       if (!origin || !destination) throw Error('Node from/to not found!');
@@ -102,12 +102,12 @@ export default class Director {
   getData() {
     return {
       nodes: this.nodes.map(n => ({ id: n.id, X: n.left, Y: n.top, text: n.text, shape: n.shape, color: n.color })),
-      connectors: this.nodes.reduce(
-        (conns: ConnectorData[], node) => [...conns,
+      links: this.nodes.reduce(
+        (conns: LinkData[], node) => [...conns,
         ...node.connectors
           .filter(n => n.toDest)
           .map(conn => {
-            let c: ConnectorData = { id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type };
+            let c: LinkData = { id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type };
             if (!conn.self) {
               if (node.ratio.h !== conn.horizon.ratioH || node.ratio.v !== conn.horizon.ratioV)
                 c.ratioS = [conn.horizon.ratioH, conn.horizon.ratioV];

@@ -2,7 +2,7 @@ import React, { useRef, useEffect, CSSProperties } from 'react';
 import { FlowchartHandles } from './hook';
 import './index.css';
 import Director from '../base/director';
-import { ConnectorData, NodeData } from '../base/types';
+import { LinkData, NodeData } from '../base/types';
 import { RectNode } from '../base/builders/rect/rect-node';
 import { CircleNode } from '../base/builders/circle/circ-node';
 import { RhomNode } from '../base/builders/rhom/rhom-node';
@@ -21,19 +21,19 @@ const Flowchart = (props: FlowchartProps) => {
     addRhomNode(left: number, top: number, text: string, id?: number, color: string = "transparent") {
       return getDirector().addNode(new RhomNode(id || 0, left, top, text, color));
     },
-    addNodes(nodes: NodeData[], conns: ConnectorData[] = []) {
+    addNodes(nodes: NodeData[], links: LinkData[] = []) {
       let rectangles = nodes.filter(n => !n.shape || n.shape === 'rectangle').map(n => new RectNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
       let circles = nodes.filter(n => n.shape === 'circle').map(n => new CircleNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
       let rhombuses = nodes.filter(n => n.shape === 'rhombus').map(n => new RhomNode(n.id || 0, n.X, n.Y, n.text, n.color || "transparent"))
       getDirector().addNodes(rectangles);
       getDirector().addNodes(circles);
       getDirector().addNodes(rhombuses);
-      getDirector().addConns(conns);
+      getDirector().addConns(links);
     },
     getData() {
       return getDirector().getData();
     },
-    changeConnType(id: number, type: string) {
+    changeLinkType(id: number, type: string) {
       getDirector().changeConnType(id, type);
     }
   })
