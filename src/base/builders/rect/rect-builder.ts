@@ -34,7 +34,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
     connectors.forEach(c => {
       if (c.self) c.slope = 0;
       else {
-        let nextCenter = c.nextNode.center(), vector = { X: nextCenter.X - sideCenter.X, Y: nextCenter.Y - sideCenter.Y };
+        let nextCenter = c.horizon.fakeP || c.nextNode.center(), vector = { X: nextCenter.X - sideCenter.X, Y: nextCenter.Y - sideCenter.Y };
         if (_side.vertical) c.slope = vector.Y === 0 ? 1000 * Math.sign(vector.X) : vector.X / vector.Y;
         else c.slope = vector.X === 0 ? 1000 * Math.sign(vector.Y) : vector.Y / vector.X;
       }
@@ -51,7 +51,7 @@ export default class RectBuilder extends NodeBuilder<RectNode> {
   connSide = function (this: RectNode, hrz: Horizon, node2: Node, builder: RectBuilder): RectSide {
     if (this.id === node2.id) return new RectSide(true, true);
     let c1 = this.center(), c2 = node2.center(), sign = (c2.X - c1.X) > 0 ? 1 : -1;
-    c2 = Util.rotate(c2, c1, - sign * Math.atan2(hrz.ratioV, hrz.ratioH));
+    c2 = hrz.fakeP = Util.rotate(c2, c1, - sign * Math.atan2(hrz.ratioV, hrz.ratioH));
     return builder.getSide(c1, this.height, this.width, c2);
   }
 

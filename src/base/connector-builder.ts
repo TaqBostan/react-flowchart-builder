@@ -230,7 +230,8 @@ export default class ConnectorBuilder {
 
   disc_mm(e: MouseEvent, node: Node) {
     if (e.buttons !== 1) return this.disc_mu(node);
-    let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!, hPoint1 = horizon.point!, hPoint2 = pairConn!.horizon.point!;
+    let { label: lbl, point, pairConn, horizon } = this.connector!, p1 = point!, p2 = pairConn!.point!,
+      hPoint1 = horizon.fakeP = horizon.point!, hPoint2 = pairConn!.horizon.point!;
     let dest = Util.mousePoint(this.org!, e, this.sd.scale);
     hPoint1.X += dest.X, hPoint1.Y += dest.Y;
     node.setPoint(this.connector!, hPoint1);

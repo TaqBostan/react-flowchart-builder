@@ -54,7 +54,7 @@ export abstract class Side {
 
 export type NodeData = { id?: number, X: number, Y: number, text: string,color?:string, shape?: string }
 
-export type Horizon = { point?: Point, ratioH: number, ratioV: number, elem?: SVGRectElement }
+export type Horizon = { point?: Point, ratioH: number, ratioV: number, elem?: SVGRectElement, fakeP?: Point }
 
 export type Connector = {
   id: number,

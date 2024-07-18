@@ -32,8 +32,8 @@ export default class CircleBuilder extends NodeBuilder<CircleNode> {
       hrz.ratioH = this.ratio.h;
       let v1 = [c2.X - c1.X, c2.Y - c1.Y], v2 = [hPoint2.X - c1.X, hPoint2.Y - c1.Y], v1v2 = v1[0] * v2[1] - v1[1] * v2[0];
       let l1 = Util.len(v1), l2 = Util.len(v2);
-      phi = l1 > 0 && l2 > 0 ? - sign * Math.asin(v1v2 / l1 / l2) : 0;
-      hrz.ratioV = - hrz.ratioH * Math.tan(phi);
+      phi = l1 > 0 && l2 > 0 ? sign * Math.asin(v1v2 / l1 / l2) : 0;
+      hrz.ratioV = hrz.ratioH * Math.tan(phi);
     }
     else phi = sign * Math.atan2(hrz.ratioV, hrz.ratioH);
     phi += Math.atan2(c2.Y - c1.Y, c2.X - c1.X);
