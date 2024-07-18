@@ -1,5 +1,5 @@
 import ConnHelper from './connection-helper';
-import { Connector, Node, Point, Side, ConnectorData, ns, StaticData, Horizon } from './types';
+import { Connector, Node, Point, Side, LinkData, ns, StaticData, Horizon } from './types';
 import Util from './util';
 export default class ConnectorBuilder {
   static editable: boolean;
@@ -53,21 +53,21 @@ export default class ConnectorBuilder {
     });
   }
 
-  connect(node: Node, connData?: ConnectorData) {
+  connect(node: Node, linkData?: LinkData) {
     if (this.sourceNode) {
-      let originNode = this.sourceNode, type = (connData?.type) ? connData.type : "solid";
+      let originNode = this.sourceNode,metaData = linkData?.meta, type = (linkData?.type) ? linkData.type : "solid";
       if (originNode.connectors.some(c => c.nextNode.id === node.id && c.toDest)) return;
       let self = originNode.id === node.id;
       let originHorizon: Horizon = { ratioH: originNode.ratio.h, ratioV: originNode.ratio.v };
-      if (connData?.ratioS) originHorizon = { ratioH: connData.ratioS[0], ratioV: connData.ratioS[1] }
-      let sideOrigin = connData?.sideS || originNode.connSide(originHorizon, node);
+      if (metaData?.ratioS) originHorizon = { ratioH: metaData.ratioS[0], ratioV: metaData.ratioS[1] }
+      let sideOrigin = metaData?.sideS ? originNode.side(metaData.sideS) : originNode.connSide(originHorizon, node);
       let group = document.createElementNS(ns, 'g') as SVGGElement;
       let path = ConnHelper.createConnector(type);
       let arrow = !self ? ConnHelper.createArrow(type) : undefined;
       group.append(path);
       if (!self) group.append(arrow!);
       this.svg.append(group);
-      let connLabel = ConnHelper.addLabel(group, ConnectorBuilder.editable, connData?.text);
+      let connLabel = ConnHelper.addLabel(group, ConnectorBuilder.editable, linkData?.text);
       let originConn: Connector = {
         id: ++this.maxId,
         group,
@@ -83,14 +83,16 @@ export default class ConnectorBuilder {
         type: type,
         selected: false
       }
+      if (metaData?.sideS) originConn.fixSide = sideOrigin;
       originNode.connectors.push(originConn);
       if (ConnectorBuilder.editable) this.labelEvent(originNode, originConn);
       originNode.arrangeSide(sideOrigin);
       if (!self) {
         let horizon: Horizon = { ratioH: node.ratio.h, ratioV: node.ratio.v };
-        if (connData?.ratioD) horizon = { ratioH: connData.ratioD[0], ratioV: connData.ratioD[1] }
-        let side = connData?.sideD ||  node.connSide(horizon, originNode);
+        if (metaData?.ratioD) horizon = { ratioH: metaData.ratioD[0], ratioV: metaData.ratioD[1] }
+        let side = metaData?.sideD ? node.side(metaData.sideD) : node.connSide(horizon, originNode);
         let conn = { ...originConn, nextNode: originNode, horizon, side, toDest: false, point: undefined, pairConn: originConn };
+        if (metaData?.sideD) conn.fixSide = side;
         originConn.pairConn = conn;
         node.connectors.push(conn);
         node.arrangeSide(side);

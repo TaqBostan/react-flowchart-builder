@@ -11,6 +11,7 @@ export abstract class Node {
   abstract center(): Point;
   abstract allSides(): Side[];
   abstract getHeight(): number;
+  abstract side(side: Side): Side;
 
   constructor(public id: number, public left: number, public top: number, public text: string, public color: string, public shape: string) {
   }
@@ -52,7 +53,7 @@ export abstract class Side {
   abstract equal(s: Side): boolean;
 }
 
-export type NodeData = { id?: number, X: number, Y: number, text: string,color?:string, shape?: string }
+export type NodeData = { id?: number, X: number, Y: number, text: string, color?: string, shape?: string }
 
 export type Horizon = { point?: Point, ratioH: number, ratioV: number, elem?: SVGRectElement, fakeP?: Point }
 
@@ -75,7 +76,9 @@ export type Connector = {
   pairConn?: Connector
 }
 
-export type LinkData = { id?: number, from: number, to: number, text?: string, type?: string, ratioS?: number[], ratioD?: number[], sideS?: Side, sideD?: Side }
+export type LinkData = { id?: number, from: number, to: number, text?: string, type?: string, meta?: MetaData }
+
+export type MetaData = { ratioS?: number[], ratioD?: number[], sideS?: Side, sideD?: Side }
 
 export type Point = { X: number, Y: number }
 

@@ -52,8 +52,8 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
   }
 
   setRatio = function (this: RhomNode, conn: Connector) {
-    let c1 = this.center(), p1 = conn.point!, c2 = conn.nextNode.center(), hrzP = conn.horizon.point!, 
-    side = conn.fixSide = conn.side as RhomSide;
+    let c1 = this.center(), p1 = conn.point!, c2 = conn.nextNode.center(), hrzP = conn.horizon.point!,
+      side = conn.fixSide = conn.side as RhomSide;
     let hy = hrzP.Y - p1.Y, hx = hrzP.X - p1.X;
     if (side.vertical) {
       if (Math.abs(hy) < 30) hy = Math.sign(hy) * 30;
@@ -79,7 +79,7 @@ export default class RhomBuilder extends NodeBuilder<RhomNode> {
   }
 
   getSide(c: Point, hrzP: Point) {
-    let vertical = Math.abs(hrzP.Y - c.Y) > Math.abs(hrzP.X - c.X) ;
+    let vertical = Math.abs(hrzP.Y - c.Y) > Math.abs(hrzP.X - c.X);
     let firstSide = vertical ? (hrzP.Y < c.Y) : (hrzP.X < c.X);
     return new RhomSide(vertical, firstSide);
   }

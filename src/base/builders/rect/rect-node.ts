@@ -25,6 +25,10 @@ export class RectNode extends Node {
   getHeight(): number {
     return this.height;
   }
+
+  side(side: RectSide) {
+    return new RectSide(side.vertical, side.firstSide);
+  }
 }
 
 

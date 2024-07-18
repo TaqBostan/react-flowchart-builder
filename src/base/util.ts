@@ -27,4 +27,9 @@ export default class Util {
     let dx = pos.X - center.X, dy = pos.Y - center.Y;
     return {X: dx * Math.cos(teta) - dy * Math.sin(teta) + center.X, Y: dx * Math.sin(teta) + dy * Math.cos(teta) + center.Y};
   }
+
+  static round(num: number, decimalPlace: number){
+    let digit = Math.pow(10,decimalPlace)
+    return Math.round((num + Number.EPSILON) * digit) / digit;
+  }
 }

@@ -19,6 +19,10 @@ export class CircleNode extends Node {
     return 2 * this.radius;
   }
 
+  side(side: CircleSide) {
+    return new CircleSide();
+  }
+  
 }
 
 export class CircleSide extends Side {

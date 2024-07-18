@@ -3,7 +3,8 @@ import RectBuilder from "./builders/rect/rect-builder";
 import RhomBuilder from "./builders/rhom/rhom-builder";
 import ConnectorBuilder from "./connector-builder";
 import NodeBuilder from "./node-builder";
-import { Connector, LinkData, Node, Point } from "./types";
+import { Connector, LinkData, MetaData, Node, Point } from "./types";
+import Util from "./util";
 
 export default class Director {
   static instance: Director;
@@ -109,11 +110,15 @@ export default class Director {
           .map(conn => {
             let c: LinkData = { id: conn.id, from: node.id, to: conn.nextNode.id, text: conn.label?.text, type: conn.type };
             if (!conn.self) {
+              let meta: MetaData = {};
               if (node.ratio.h !== conn.horizon.ratioH || node.ratio.v !== conn.horizon.ratioV)
-                c.ratioS = [conn.horizon.ratioH, conn.horizon.ratioV];
+                meta.ratioS = [Util.round(conn.horizon.ratioH, 2), Util.round(conn.horizon.ratioV, 2)];
+              if (conn.fixSide) meta.sideS = conn.fixSide;
               let _conn = conn.pairConn!;
               if (conn.nextNode.ratio.h !== _conn.horizon.ratioH || conn.nextNode.ratio.v !== _conn.horizon.ratioV)
-                c.ratioD = [_conn.horizon.ratioH, _conn.horizon.ratioV];
+                meta.ratioD = [Util.round(_conn.horizon.ratioH, 2), Util.round(_conn.horizon.ratioV, 2)];
+              if (_conn.fixSide) meta.sideD = _conn.fixSide;
+              if (Object.keys(meta).length) c.meta = meta;
             }
             return c;
           }

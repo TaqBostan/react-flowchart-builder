@@ -25,6 +25,10 @@ export class RhomNode extends Node {
   getHeight(): number {
     return this.diameter;
   }
+
+  side(side: RhomSide) {
+    return new RhomSide(side.vertical, side.firstSide);
+  }
 }
 
 export class RhomSide extends Side {
