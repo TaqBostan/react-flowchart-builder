@@ -9,7 +9,7 @@ A lightweight component to design flowcharts. Check out the [demo](https://d5y3k
 - Zoom and Pan
 - Raw or typed input/output
 
-![Screenshot of ImageAnnotator](https://github.com/TaqBostan/content/blob/main/flowchart.png?raw=true)
+![Screenshot of ImageAnnotator](https://github.com/TaqBostan/content/blob/main/flowchart.gif?raw=true)
 
 ## Usage
 
