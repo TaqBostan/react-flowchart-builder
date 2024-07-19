@@ -86,6 +86,7 @@ export default abstract class NodeBuilder<N extends Node> {
     let { foreign, input } = Util.createLabelInput(width, height, 7, node.labelY(height, false), lbl.innerHTML);
     lbl.after(foreign);
     input.focus();
+    input.onmousedown = (e: MouseEvent) => e.stopPropagation();
     input.oninput = () => {
       lbl.innerHTML = input.value;
       lbl.setAttribute('width', `${input.offsetWidth + 2}`);
@@ -93,7 +94,7 @@ export default abstract class NodeBuilder<N extends Node> {
       foreign.setAttribute("width", `${input.offsetWidth}`);
     }
     input.onblur = () => {
-      lbl.innerHTML = input.value;
+      node.text = lbl.innerHTML = input.value;
       lbl.removeAttribute('visibility');
       foreign.remove();
       this.updateNode(node);

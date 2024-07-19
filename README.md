@@ -112,6 +112,7 @@ Below is the data model for nodes:
 | `X` \* | `number` | The `x` position of the node |  |
 | `Y` \* | `number` | The `y` position of the node |  |
 | `text` \* | `string` | Node text |  |
+| `color` | `string` | Node color | white |
 | `shape` | `string` | Node shape can be `rectangle`, `circle`, or `rhombus` | `rectangle` |
 
 (\*) required props
@@ -125,6 +126,8 @@ Below is the data model for links:
 | `from` \* | `number` | The `id` of the origin node |  |
 | `to` \* | `number` | The `id` of the destination node |  |
 | `text` | `string` | Link label |  |
+| `type` | `string` | Link type (solid/dashed) | solid |
+| `meta` | `object` | information about the shape of the link | |
 
 (\*) required props
 

@@ -93,6 +93,7 @@ export default class ConnectorBuilder {
         let side = metaData?.sideD ? node.side(metaData.sideD) : node.connSide(horizon, originNode);
         let conn = { ...originConn, nextNode: originNode, horizon, side, toDest: false, point: undefined, pairConn: originConn };
         if (metaData?.sideD) conn.fixSide = side;
+        else conn.fixSide = undefined;
         originConn.pairConn = conn;
         node.connectors.push(conn);
         node.arrangeSide(side);
