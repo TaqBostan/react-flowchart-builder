@@ -112,11 +112,11 @@ export default class Director {
             if (!conn.self) {
               let meta: MetaData = {};
               if (node.ratio.h !== conn.horizon.ratioH || node.ratio.v !== conn.horizon.ratioV)
-                meta.ratioS = [Util.round(conn.horizon.ratioH, 2), Util.round(conn.horizon.ratioV, 2)];
+                meta.ratioS = [Util.round(conn.horizon.ratioH, 3), Util.round(conn.horizon.ratioV, 3)];
               if (conn.fixSide) meta.sideS = conn.fixSide;
               let _conn = conn.pairConn!;
               if (conn.nextNode.ratio.h !== _conn.horizon.ratioH || conn.nextNode.ratio.v !== _conn.horizon.ratioV)
-                meta.ratioD = [Util.round(_conn.horizon.ratioH, 2), Util.round(_conn.horizon.ratioV, 2)];
+                meta.ratioD = [Util.round(_conn.horizon.ratioH, 3), Util.round(_conn.horizon.ratioV, 3)];
               if (_conn.fixSide) meta.sideD = _conn.fixSide;
               if (Object.keys(meta).length) c.meta = meta;
             }

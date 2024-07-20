@@ -125,9 +125,10 @@ export default class ConnectorBuilder {
       lbl.box.setAttribute('width', `${input.offsetWidth + 2}`);
     }
     input.onblur = () => {
+      input.onblur = () => {};
       lbl.text = input.value;
       foreign.remove();
-      lbl.g.remove()
+      lbl.g.remove();
       let connLabel = ConnHelper.addLabel(conn.group, ConnectorBuilder.editable, lbl.text);
       Object.assign(lbl, connLabel);
       this.updateAllConn(node);
