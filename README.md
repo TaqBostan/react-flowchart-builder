@@ -127,7 +127,7 @@ Below is the data model for links:
 | `to` \* | `number` | The `id` of the destination node |  |
 | `text` | `string` | Link label |  |
 | `type` | `string` | Link type (solid/dashed) | solid |
-| `meta` | `object` | information about the shape of the link | |
+| `meta` | `object` | Information about the shape of the link | |
 
 (\*) required props
 
